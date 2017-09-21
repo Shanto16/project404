@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="8dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/from_journey"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="From"
+            android:hint="From"
+            android:ems="15"
+            app:met_iconLeft="@drawable/ic_start_point"
+            app:met_iconPadding="0dp"
+            app:met_minCharacters="2"
+            />
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/destination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="Destination"
+            android:hint="Destination"
+            android:ems="15"
+            app:met_iconLeft="@drawable/ic_end_point"
+            app:met_iconPadding="0dp"
+            app:met_minCharacters="2"
+            />
+
+
+        <io.blackbox_vision.datetimepickeredittext.view.DatePickerEditText
+            android:id="@+id/et_trip_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="15"
+            android:drawableLeft="@drawable/ic_trip_date"
+            android:layout_marginStart="14dp"
+            android:layout_marginBottom="8dp"
+            android:hint="Select Date"/>
+
+
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/amount_per"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="Amount per person"
+            android:hint="Amount per person"
+            android:ems="15"
+            app:met_iconLeft="@drawable/ic_amount_per_head"
+            app:met_iconPadding="0dp"
+            android:foregroundTint="@color/colorAccent"
+            />
+
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/common_expense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="Common expenditure"
+            android:hint="Common expenditure"
+            android:ems="15"
+            app:met_iconLeft="@drawable/ic_amount_per_head"
+            app:met_iconPadding="0dp"
+            android:foregroundTint="@color/colorAccent"
+            />
+
+        <Button
+            android:id="@+id/membersDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  Member Informations"
+            android:layout_gravity="center_horizontal"
+            android:drawableLeft="@drawable/ic_members"/>
+
+
+
+
+        <Button
+            android:id="@+id/start_trip_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="  Start Trip"
+            android:layout_gravity="center_horizontal"
+            android:drawableLeft="@drawable/ic_add_new"/>
+
+
+    </LinearLayout>
+
+
+
+
+</android.support.v4.widget.NestedScrollView>

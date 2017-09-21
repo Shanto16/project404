@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="mcgyvers.mobitrip.CompletedTrip"
+        android:layout_margin="16dp"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/origin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="From:"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/originTXT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="London"
+            android:layout_below="@+id/origin"
+            android:textSize="32sp"/>
+
+        <TextView
+            android:id="@+id/destination_"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="To:"
+            android:layout_below="@+id/originTXT"
+            android:layout_marginTop="16dp"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/destination_TXT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Brazil"
+            android:layout_below="@+id/destination_"
+            android:textSize="32sp"/>
+
+
+        <RelativeLayout
+            android:layout_marginTop="32sp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+
+            <ImageView
+                android:id="@+id/date_IV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_trip_date"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                 />
+
+            <TextView
+                android:id="@+id/dateTXT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/date_IV"
+                android:layout_toRightOf="@+id/date_IV"
+                android:text="Date:"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="16dp"
+                />
+
+            <TextView
+                android:id="@+id/show_trip_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/date_IV"
+                android:layout_toRightOf="@+id/dateTXT"
+                android:text="23/5/2017"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="8dp"
+               />
+
+            <ImageView
+                android:id="@+id/total_member"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/date_IV"
+                android:layout_below="@+id/date_IV"
+                android:src="@drawable/ic_members" />
+
+
+            <TextView
+                android:id="@+id/total_membersTXT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/total_member"
+                android:text="Team size:"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_toRightOf="@+id/total_member"
+                />
+
+
+            <TextView
+                android:id="@+id/show_trip_total_member"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/total_member"
+                android:text="7"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="8dp"
+                android:layout_toRightOf="@+id/total_membersTXT"
+                />
+
+            <ImageView
+                android:id="@+id/total_EXP"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/total_member"
+                android:layout_below="@+id/total_member"
+                android:src="@drawable/ic_team_expense" />
+
+
+            <TextView
+                android:id="@+id/total_expenseTXT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/total_EXP"
+                android:text="Total expense:"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_toRightOf="@+id/total_EXP"
+                />
+
+            <TextView
+                android:id="@+id/show_trip_total_expense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/total_EXP"
+                android:text="7000"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="8dp"
+                android:layout_toRightOf="@+id/total_expenseTXT"
+                />
+
+
+            <ImageView
+                android:id="@+id/per_exp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/total_member"
+                android:layout_below="@+id/total_EXP"
+                android:src="@drawable/ic_my_expense" />
+
+
+            <TextView
+                android:id="@+id/avg_expense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/per_exp"
+                android:text="Avg. per expense:"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="16dp"
+                android:layout_toRightOf="@+id/per_exp"
+                />
+
+            <TextView
+                android:id="@+id/show_avg_expense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/avg_expense"
+                android:text="7000"
+                android:layout_marginStart="8dp"
+                android:layout_toRightOf="@+id/avg_expense"
+                />
+        </RelativeLayout>
+
+
+        <Button
+            android:id="@+id/membersDetails"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:text="  Members"
+            android:layout_gravity="center_horizontal"
+            android:drawableLeft="@drawable/ic_members"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
+            android:background="@drawable/hospital_button"/>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/trip_pictures"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:numColumns="3"
+            android:layout_marginBottom="4dp"
+            android:stretchMode="columnWidth" />
+
+
+    </LinearLayout>
+
+
+
+</android.support.v4.widget.NestedScrollView>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="140dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="4dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    app:cardElevation="4dp"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="4dp">
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/model_member_name"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            app:met_floatingLabelText="Name"
+            android:hint="Name"
+            android:inputType="textPersonName"
+            android:textSize="14sp"
+            app:met_iconLeft="@drawable/ic_assignment_ind_white_24dp"/>
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/model_member_amount"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            app:met_floatingLabelText="Amount"
+            android:hint="Amount"
+            android:textSize="14sp"
+            android:inputType="numberDecimal"
+            android:layout_below="@+id/model_member_name"
+            android:layout_marginStart="32dp"
+            app:met_iconLeft="@drawable/ic_amount_per_head"/>
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/model_member_phone"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            app:met_floatingLabelText="Phone Number"
+            android:hint="Phone Number"
+            android:textSize="14sp"
+            android:inputType="phone"
+            android:layout_below="@+id/model_member_amount"
+            android:layout_alignStart="@+id/model_member_amount"
+            app:met_iconLeft="@drawable/ic_call_white_24dp"/>
+
+        <ImageView
+            android:id="@+id/delete_model"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_dismiss_trip"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="4dp"
+            android:layout_alignParentTop="true"
+            android:elevation="8dp"
+            />
+
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>
