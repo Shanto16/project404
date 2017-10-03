@@ -2,6 +2,7 @@ package mcgyvers.mobitrip;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -194,6 +195,13 @@ public class Current_trip extends Fragment {
                 dialog.show();
 
 
+            }
+        });
+
+        maps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), MapsActivity.class));
             }
         });
 
