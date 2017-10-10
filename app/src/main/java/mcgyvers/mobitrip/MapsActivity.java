@@ -2,6 +2,7 @@ package mcgyvers.mobitrip;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -16,15 +17,21 @@ import android.widget.RelativeLayout.LayoutParams;
 
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.mylocation.SimpleLocationOverlay;
+
+import java.util.ArrayList;
 
 import mcgyvers.mobitrip.interfaces.OpenStreetMapConstants;
 
@@ -76,15 +83,11 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
                 LayoutParams.FILL_PARENT));
 
 
+        // disabling the stric mode for making network calls on the main thread
+        // PS: REMOVE THOSE LINES OF CODE FOR THE PRODUCTION VERSION
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
-
-        /*
-        map = (MapView) findViewById(R.id.map);
-        //map = new MapView(inflater.getContext())
-        map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setBuiltInZoomControls(true);
-        map.setMultiTouchControls(true);
-        */
 
 
 
@@ -143,8 +146,23 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
         // Default location and zoom level
         IMapController mapController = mMapView.getController();
         mapController.setZoom(13);
-        GeoPoint startPoint = new GeoPoint(50.936255, 6.957779);
+        GeoPoint startPoint = new GeoPoint(48.13, -1.6);
         mapController.setCenter(startPoint);
+
+        // testing markers
+        Marker startMaker = new Marker(mMapView);
+        startMaker.setPosition(startPoint);
+        startMaker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        mMapView.getOverlays().add(startMaker);
+        startMaker.setIcon(getResources().getDrawable(R.drawable.ic_tourist_spots));
+        startMaker.setTitle("Start point");
+        mMapView.invalidate();
+
+        GeoPoint endPoint = new GeoPoint(48.4, -1.9);
+
+        drawPath(startPoint, endPoint);
+
+
 
         // PathOverlay pathOverlay = new PathOverlay(Color.RED, this);
         // pathOverlay.addPoint(new GeoPoint(40.714623, -74.006605));
@@ -160,6 +178,34 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
 
 
     }
+
+
+    /**
+     * Method for drawing a basic waypoint between a start and end
+     * point of a trip. It implements the path into the global {@link MapView}
+     * mMapView of the activity
+     *
+     * @param start a GeoPoint object with start coordinates
+     * @param end GeoPoint with end coordinates
+     * @return void
+     *
+     */
+
+    public void drawPath(GeoPoint start, GeoPoint end){
+        RoadManager roadManager = new OSRMRoadManager(this);
+
+        ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
+        waypoints.add(start);
+        waypoints.add(end);
+
+        Road road = roadManager.getRoad(waypoints);
+        Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
+        mMapView.getOverlays().add(roadOverlay);
+        mMapView.invalidate();
+
+    }
+
+
 
     // ===========================================================
     // Getter & Setter
