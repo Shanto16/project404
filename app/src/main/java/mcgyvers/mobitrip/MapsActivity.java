@@ -2,6 +2,7 @@ package mcgyvers.mobitrip;
 
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
@@ -17,6 +18,9 @@ import android.widget.RelativeLayout.LayoutParams;
 
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.location.NominatimPOIProvider;
+import org.osmdroid.bonuspack.location.POI;
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -25,6 +29,7 @@ import org.osmdroid.tileprovider.tilesource.ITileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.FolderOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.MinimapOverlay;
 import org.osmdroid.views.overlay.Polyline;
@@ -160,7 +165,8 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
 
         GeoPoint endPoint = new GeoPoint(48.4, -1.9);
 
-        drawPath(startPoint, endPoint);
+        drawPath(startPoint, endPoint, false);
+        //drawPrefs("Fuel", startPoint);
 
 
 
@@ -187,21 +193,90 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
      *
      * @param start a GeoPoint object with start coordinates
      * @param end GeoPoint with end coordinates
+     * @param bycicle if a bycicle route is required
      * @return void
      *
      */
 
-    public void drawPath(GeoPoint start, GeoPoint end){
-        RoadManager roadManager = new OSRMRoadManager(this);
+    public void drawPath(GeoPoint start, GeoPoint end, boolean bycicle){
+
 
         ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
         waypoints.add(start);
         waypoints.add(end);
 
+
+        RoadManager roadManager;
+
+        if(bycicle){
+            roadManager = new MapQuestRoadManager("kotHZmV3AzxQP6K6AhJzl2lvneBbmOdl");
+            roadManager.addRequestOption("routeType=bicycle"); // a pedestrian option could be added as well
+        } else {
+            roadManager = new OSRMRoadManager(this);
+        }
+
+
+
+
         Road road = roadManager.getRoad(waypoints);
         Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
         mMapView.getOverlays().add(roadOverlay);
         mMapView.invalidate();
+
+        /*
+        NominatimPOIProvider poiProvider = new NominatimPOIProvider("OSMBonusPackTutoUserAgent");
+        ArrayList<POI> pois = poiProvider.getPOIAlong(road.getRouteLow(), "fuel", 50, 2.0);
+
+        FolderOverlay poiMarkers = new FolderOverlay(this);
+        mMapView.getOverlays().add(poiMarkers);
+
+        Drawable poiIcon = getResources().getDrawable(R.drawable.ic_gas_pumps); // change this for other POIs
+        for(POI poi:pois){
+            Marker poiMarker = new Marker(mMapView);
+            poiMarker.setTitle(poi.mType);
+            poiMarker.setSnippet(poi.mDescription);
+            poiMarker.setPosition(poi.mLocation);
+            poiMarker.setIcon(poiIcon);
+            if (poi.mThumbnail != null){
+                poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
+            }
+            poiMarkers.add(poiMarker);
+        }*/
+
+    }
+
+    /**
+     * Method for drawing different points of interest(POIs) close to
+     * provided coordinates
+     *
+     * @param prefs name of the preference to be drawn in the map
+     * @param closeTo GeoPoint object to point where prefs should be drawn close to
+     * @return void
+     */
+
+    public void drawPrefs(String prefs, GeoPoint closeTo){
+
+        NominatimPOIProvider poiProvider = new NominatimPOIProvider("OSMBonusPackTutoUserAgent");
+        ArrayList<POI> pois = poiProvider.getPOICloseTo(closeTo, prefs, 50, 2.0);
+
+        FolderOverlay poiMarkers = new FolderOverlay(this);
+        mMapView.getOverlays().add(poiMarkers);
+
+        Drawable poiIcon = getResources().getDrawable(R.drawable.ic_gas_pumps); // change this for other POIs
+        for(POI poi:pois){
+            Marker poiMarker = new Marker(mMapView);
+            poiMarker.setTitle(poi.mType);
+            poiMarker.setSnippet(poi.mDescription);
+            poiMarker.setPosition(poi.mLocation);
+            poiMarker.setIcon(poiIcon);
+            if (poi.mThumbnail != null){
+                poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
+            }
+            poiMarkers.add(poiMarker);
+        }
+
+        //for drawing POIs along a route
+
 
     }
 
