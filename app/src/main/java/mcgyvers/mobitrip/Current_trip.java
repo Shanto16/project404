@@ -1,11 +1,19 @@
 package mcgyvers.mobitrip;
 
+import android.*;
+import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
@@ -25,6 +33,10 @@ import android.widget.Toast;
 
 import com.timqi.sectorprogressview.ColorfulRingProgressView;
 
+import java.util.List;
+import java.util.Locale;
+
+import static mcgyvers.mobitrip.R.id.place_autocomplete_prediction_primary_text;
 import static mcgyvers.mobitrip.R.id.toolbar;
 
 /**
@@ -33,7 +45,7 @@ import static mcgyvers.mobitrip.R.id.toolbar;
 
 public class Current_trip extends Fragment {
 
-    float max = 5000, min = 2045;
+    float max = 5000, min = 1200;
 
     float pcnt = (min / max) * 100;
 
@@ -41,6 +53,7 @@ public class Current_trip extends Fragment {
     ColorfulRingProgressView expenseProgress;
     Toolbar mToolbar;
 
+    private static final int MY_PERMISSION_REQUEST_LOCATION=1;
 
     Button team_expense, my_expense,hospitals,policeStation,maps,camera,restaurants,hotels,fuel,spots,dismiss,finish;
 
@@ -53,8 +66,6 @@ public class Current_trip extends Fragment {
         mToolbar = rootView.findViewById(R.id.toolbar);
 
         getActivity().supportInvalidateOptionsMenu();
-
-
 
 
         Typeface regular = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Regular.ttf");
@@ -85,6 +96,29 @@ public class Current_trip extends Fragment {
 
 
 
+
+
+        if (ContextCompat.checkSelfPermission(getActivity(),android.Manifest.permission.ACCESS_COARSE_LOCATION)!=
+                PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)){
+                ActivityCompat.requestPermissions(getActivity(),new String[]{
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                },MY_PERMISSION_REQUEST_LOCATION);
+            }else{
+                ActivityCompat.requestPermissions(getActivity(),new String[]{
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                },MY_PERMISSION_REQUEST_LOCATION);
+            }
+        } else{
+            LocationManager locationManager  = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            try{
+                currentLocation.setText(myLocation(location.getLatitude(),location.getLongitude()));
+            }catch (Exception e){
+                e.printStackTrace();
+                Toast.makeText(getActivity(), "Location not found", Toast.LENGTH_SHORT).show();
+            }
+        }
 
 
         hospitals.setTransformationMethod(null);
@@ -209,6 +243,29 @@ public class Current_trip extends Fragment {
         return rootView;
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults){
+        switch (requestCode){
+            case MY_PERMISSION_REQUEST_LOCATION : {
+                if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    if(ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION)==PackageManager.PERMISSION_GRANTED){
+                        LocationManager locationManager  = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        try{
+                            currentLocation.setText(myLocation(location.getLatitude(),location.getLongitude()));
+                        }catch (Exception e){
+                            e.printStackTrace();
+                            Toast.makeText(getActivity(), "Location not found", Toast.LENGTH_SHORT).show();
+                        }
+                    }else{
+                        Toast.makeText(getActivity(), "Location permission is not granted!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_current_trip, menu);
@@ -232,5 +289,22 @@ public class Current_trip extends Fragment {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    //GETTING CURRENT CITY NAME
+    public String myLocation(double latitude, double longitude){
+        String myCity = "";
+        Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+        List<Address> addressList ;
+        try{
+            addressList = geocoder.getFromLocation(latitude,longitude,1);
+
+            if(addressList.size()>0){
+                myCity = addressList.get(0).getLocality();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return myCity;
     }
 }

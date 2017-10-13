@@ -1,210 +1,310 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#ececec">
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="16dp"
-    android:orientation="vertical">
-
-
-    <include
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        layout="@layout/cardview_current_trip"/>
-
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:orientation="horizontal">
+        android:layout_margin="16dp"
+        android:orientation="vertical">
 
-       <LinearLayout
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:orientation="vertical"
-           android:layout_weight="1">
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="18dp"
+            app:cardCornerRadius="4dp">
 
-           <Button
-               android:id="@+id/cam_current"
-               android:layout_width="match_parent"
-               android:layout_height="45dp"
-               android:text="Camera"
-               android:drawableLeft="@drawable/btn_camera"
-               android:background="@drawable/btn_navigation"
-               android:paddingStart="16dp"
-               android:paddingEnd="16dp"
-               android:layout_margin="4dp"
-              />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-           <Button
-               android:id="@+id/nav_restaurants"
-               android:layout_width="match_parent"
-               android:layout_height="45dp"
-               android:text="Restaurants"
-               android:drawableLeft="@drawable/ic_restaurants"
-               android:background="@drawable/restaurant_button"
-               android:paddingStart="16dp"
-               android:paddingEnd="16dp"
-               android:layout_margin="4dp"
-               />
+                <com.timqi.sectorprogressview.ColorfulRingProgressView
+                    android:id="@+id/expense_progressbar"
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_margin="16dp"
+                    app:bgColor="#e1e1e1"
+                    app:fgColorEnd="#455A64"
+                    app:fgColorStart="#90A4AE"
+                    app:percent="70"
+                    app:startAngle="0"
+                    app:strokeWidth="5dp" />
 
-           <Button
-               android:id="@+id/nav_fuel"
-               android:layout_width="match_parent"
-               android:layout_height="45dp"
-               android:layout_margin="4dp"
-               android:background="@drawable/gas_button"
-               android:drawableLeft="@drawable/ic_gas_pumps"
-               android:paddingEnd="16dp"
-               android:paddingStart="16dp"
-               android:text="Fuel Stations" />
+                <TextView
+                    android:id="@+id/pcnt_expense"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="56dp"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="20sp" />
 
-           <Button
-               android:id="@+id/nav_police"
-               android:layout_width="match_parent"
-               android:layout_height="45dp"
-               android:layout_margin="4dp"
-               android:background="@drawable/btn_police"
-               android:drawableLeft="@drawable/ic_police_station"
-               android:paddingEnd="16dp"
-               android:paddingStart="16dp"
-               android:text="Police Station" />
+                <TextView
+                    android:id="@+id/spent_card"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/pcnt_expense"
+                    android:layout_centerHorizontal="true"
+                    android:text="Spent"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="14sp" />
 
-
-           <Button
-               android:id="@+id/my_expense_button"
-               android:layout_width="match_parent"
-               android:layout_height="45dp"
-               android:text="My Expense"
-               android:drawableLeft="@drawable/ic_my_expense"
-               android:layout_marginTop="32dp"
-               android:background="@drawable/btn_my_expense"
-               android:paddingStart="16dp"
-               android:paddingEnd="16dp"
-               android:layout_marginEnd="4dp"
-               android:layout_marginStart="4dp"
-
-               />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/expense_progressbar"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    android:orientation="horizontal">
 
 
-       </LinearLayout>
+                    <ImageView
+                        android:id="@+id/current_location_icon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:padding="4dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_current_location" />
+
+                    <TextView
+                        android:id="@+id/current_location_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Thanchi"
+                        android:textColor="@color/colorAccent" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
+
+                    <ImageView
+                        android:id="@+id/temp_icon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_temparature" />
+
+                    <TextView
+                        android:id="@+id/temp_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="32°c"
+                        android:textColor="@color/colorAccent" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1" />
+
+
+                    <ImageView
+                        android:id="@+id/weather_icon"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:padding="4dp"
+                        android:src="@drawable/ic_weather" />
+
+                    <TextView
+                        android:id="@+id/weather_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Cloudy"
+                        android:textColor="@color/colorAccent" />
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
+
+        </android.support.v7.widget.CardView>
+
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_marginTop="32dp"
+            android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/nav_hospitals"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:text="Hospitals"
-                android:drawableLeft="@drawable/ic_hospitals"
-                android:background="@drawable/hospital_button"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_margin="4dp"
-                />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/nav_hotels"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:text="Hotels"
-                android:drawableLeft="@drawable/ic_local_hotels"
-                android:background="@drawable/hotel_button"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_margin="4dp"
-                />
+                <Button
+                    android:id="@+id/cam_current"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/btn_navigation"
+                    android:drawableLeft="@drawable/btn_camera"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Camera" />
 
+                <Button
+                    android:id="@+id/nav_restaurants"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/restaurant_button"
+                    android:drawableLeft="@drawable/ic_restaurants"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Restaurants" />
 
-            <Button
-                android:id="@+id/nav_spots"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:text="Tourist Spots"
-                android:drawableLeft="@drawable/ic_tourist_spots"
-                android:background="@drawable/tourists_button"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_margin="4dp"
-                />
+                <Button
+                    android:id="@+id/nav_fuel"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/gas_button"
+                    android:drawableLeft="@drawable/ic_gas_pumps"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Fuel Stations" />
 
-            <Button
-                android:id="@+id/nav_maps"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:drawableLeft="@drawable/ic_maps"
-                android:text="Maps"
-                android:background="@drawable/maps_button"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_margin="4dp"
-                />
-
-
-
-            <Button
-                android:id="@+id/team_expense_button"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:text="Team Expense"
-                android:drawableLeft="@drawable/ic_attach_money_black_24dp"
-                android:layout_marginTop="32dp"
-                android:background="@drawable/btn_my_expense"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginStart="4dp"
-                />
+                <Button
+                    android:id="@+id/nav_police"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/btn_police"
+                    android:drawableLeft="@drawable/ic_police_station"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Police Station" />
 
 
+                <Button
+                    android:id="@+id/my_expense_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="32dp"
+                    android:background="@drawable/btn_my_expense"
+                    android:drawableLeft="@drawable/ic_my_expense"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:text="My Expense"
+
+                    />
 
 
+            </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/nav_hospitals"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/hospital_button"
+                    android:drawableLeft="@drawable/ic_hospitals"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Hospitals" />
+
+                <Button
+                    android:id="@+id/nav_hotels"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/hotel_button"
+                    android:drawableLeft="@drawable/ic_local_hotels"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Hotels" />
+
+
+                <Button
+                    android:id="@+id/nav_spots"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/tourists_button"
+                    android:drawableLeft="@drawable/ic_tourist_spots"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Tourist Spots" />
+
+                <Button
+                    android:id="@+id/nav_maps"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_margin="4dp"
+                    android:background="@drawable/maps_button"
+                    android:drawableLeft="@drawable/ic_maps"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Maps" />
+
+
+                <Button
+                    android:id="@+id/team_expense_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginTop="32dp"
+                    android:background="@drawable/btn_my_expense"
+                    android:drawableLeft="@drawable/ic_attach_money_black_24dp"
+                    android:paddingEnd="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Team Expense" />
+
+
+            </LinearLayout>
         </LinearLayout>
+
+
+        <Button
+            android:id="@+id/nav_dismiss"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/btn_dismiss"
+            android:drawableLeft="@drawable/ic_dismiss_trip"
+            android:foreground="?attr/selectableItemBackground"
+            android:paddingEnd="30dp"
+            android:paddingStart="30dp"
+            android:text="Dismiss" />
+
+        <Button
+            android:id="@+id/nav_finish"
+            android:layout_width="200dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="40dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/btn_finish_trip"
+            android:drawableLeft="@drawable/ic_end_trip"
+            android:foreground="?attr/selectableItemBackground"
+            android:paddingEnd="30dp"
+            android:paddingStart="30dp"
+            android:text="End Trip" />
+
+
     </LinearLayout>
-
-
-
-    <Button
-        android:id="@+id/nav_dismiss"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center_horizontal"
-        android:text="Dismiss"
-        android:drawableLeft="@drawable/ic_dismiss_trip"
-        android:paddingStart="30dp"
-        android:foreground="?attr/selectableItemBackground"
-        android:paddingEnd="30dp"
-        android:layout_marginTop="30dp"
-        android:background="@drawable/btn_dismiss"/>
-
-    <Button
-        android:id="@+id/nav_finish"
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center_horizontal"
-        android:text="End Trip"
-        android:drawableLeft="@drawable/ic_end_trip"
-        android:paddingStart="30dp"
-        android:paddingEnd="30dp"
-        android:background="@drawable/btn_finish_trip"
-        android:layout_marginTop="8dp"
-        android:foreground="?attr/selectableItemBackground"
-        android:layout_marginBottom="40dp"/>
-
-
-</LinearLayout>
 
 </ScrollView>

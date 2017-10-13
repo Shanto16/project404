@@ -7,36 +7,85 @@
     android:layout_margin="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/from_journey"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="From"
-            android:hint="From"
-            android:ems="15"
-            app:met_iconLeft="@drawable/ic_start_point"
-            app:met_iconPadding="0dp"
-            app:met_minCharacters="2"
-            />
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/destination"
-            android:layout_width="wrap_content"
+
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="Destination"
-            android:hint="Destination"
-            android:ems="15"
-            app:met_iconLeft="@drawable/ic_end_point"
-            app:met_iconPadding="0dp"
-            app:met_minCharacters="2"
-            />
+            app:cardCornerRadius="4dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
+            android:elevation="4dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/from_journey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelText="From"
+                    android:hint="From"
+                    android:ems="15"
+                    app:met_iconLeft="@drawable/ic_start_point"
+                    app:met_iconPadding="0dp"
+                    app:met_minCharacters="2"
+                    />
+
+
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/destination"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelText="Destination"
+                    android:hint="Destination"
+                    android:ems="15"
+                    app:met_iconLeft="@drawable/ic_end_point"
+                    app:met_iconPadding="0dp"
+                    app:met_minCharacters="2"
+                    />
+
+                <CheckBox
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Download map"
+                    android:textColor="@color/colorAccent"
+                    android:backgroundTint="@color/colorAccent"
+                    android:layout_marginStart="-16dp"
+                    android:layout_marginEnd="8dp"
+                    android:textSize="20sp"
+                    android:scaleX="0.70"
+                    android:scaleY="0.70"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/radio_sub_text"
+                    android:textSize="12sp"
+                    android:layout_marginTop="-8dp"
+                    android:layout_marginStart="33dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:textColor="#9e9e9e"/>
+
+            </LinearLayout>
+
+
+
+        </android.support.v7.widget.CardView>
+
 
 
         <io.blackbox_vision.datetimepickeredittext.view.DatePickerEditText
@@ -47,6 +96,7 @@
             android:drawableLeft="@drawable/ic_trip_date"
             android:layout_marginStart="14dp"
             android:layout_marginBottom="8dp"
+            android:backgroundTint="@color/colorAccent"
             android:hint="Select Date"/>
 
 
