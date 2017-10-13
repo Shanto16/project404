@@ -1,11 +1,17 @@
 package mcgyvers.mobitrip;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,7 +20,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
-
 
 
 import org.osmdroid.api.IMapController;
@@ -69,9 +74,15 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
     // ===========================================================
 
 
+    final int TWO_MINUTES = 1000 * 60 * 2; // interval between update requests
+    Location lastKnownLocation; // last known location for estimation purposes
+    LocationManager locationManager;
+    LocationListener locationListener;
+    IMapController mapController;
     MapView map;
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Context ctx = getApplicationContext();
         //important! set your user agent to prevent getting banned from the osm servers
@@ -112,10 +123,10 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
         /* SingleLocation-Overlay */
         {
             /*
-			 * Create a static Overlay showing a single location. (Gets updated in
+             * Create a static Overlay showing a single location. (Gets updated in
 			 * onLocationChanged(Location loc)!
 			 */
-            this.mMyLocationOverlay = new SimpleLocationOverlay(((BitmapDrawable)getResources().getDrawable(org.osmdroid.library.R.drawable.person)).getBitmap());
+            this.mMyLocationOverlay = new SimpleLocationOverlay(((BitmapDrawable) getResources().getDrawable(org.osmdroid.library.R.drawable.person)).getBitmap());
             this.mMapView.getOverlays().add(mMyLocationOverlay);
 
         }
@@ -127,8 +138,8 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
             ivZoomIn.setImageResource(org.osmdroid.library.R.drawable.zoom_in);
             /* Create RelativeLayoutParams, that position it in the top right corner. */
             final RelativeLayout.LayoutParams zoominParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
+                    RelativeLayout.LayoutParams.WRAP_CONTENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT);
             zoominParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             zoominParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);
             rl.addView(ivZoomIn, zoominParams);
@@ -149,25 +160,16 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
         }
 
         // Default location and zoom level
-        IMapController mapController = mMapView.getController();
+        mapController = mMapView.getController();
         mapController.setZoom(13);
-        GeoPoint startPoint = new GeoPoint(48.13, -1.6);
-        mapController.setCenter(startPoint);
+        //GeoPoint startPoint = new GeoPoint(48.13, -1.6);
+        //mapController.setCenter(startPoint);
 
-        // testing markers
-        Marker startMaker = new Marker(mMapView);
-        startMaker.setPosition(startPoint);
-        startMaker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        mMapView.getOverlays().add(startMaker);
-        startMaker.setIcon(getResources().getDrawable(R.drawable.ic_tourist_spots));
-        startMaker.setTitle("Start point");
-        mMapView.invalidate();
 
-        GeoPoint endPoint = new GeoPoint(48.4, -1.9);
+        //GeoPoint endPoint = new GeoPoint(48.4, -1.9);
 
-        drawPath(startPoint, endPoint, false);
+        //drawPath(startPoint, endPoint, false);
         //drawPrefs("Fuel", startPoint);
-
 
 
         // PathOverlay pathOverlay = new PathOverlay(Color.RED, this);
@@ -181,8 +183,205 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
         this.setContentView(rl);
 
 
+        // testing the GPS functionality:
+        // Acquire a reference to the system Location Manager
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        // getting the last known location in order to make a current best estimate
+        String locationProvider = LocationManager.NETWORK_PROVIDER;
+        if(lastKnownLocation == null){
+            checkPermission();
+            lastKnownLocation = locationManager.getLastKnownLocation(locationProvider);
+        }
 
 
+
+        // Define a listener that responds to location updates
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+
+                //Called when a new location is found by the network location provider
+                makeUseOfNewLocation(location);
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
+
+
+
+
+        collectLocationSamples();
+
+
+
+
+
+
+
+    }
+
+    public void checkPermission(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+    }
+
+
+    /**
+     * Simply puts a marker on whatever location it is given by currentLocation
+     * then updates the mapview. Intended for using with GPS to set the user's current
+     * location
+     *
+     * @param currentLocation Location object containing whatever coordinates we want to mark
+     * @param center option to centralize the map to the given point
+     */
+    private void setCurrentLocation(Location currentLocation, boolean center){
+
+        double lati = currentLocation.getLatitude();
+        double longi = currentLocation.getLongitude();
+
+        GeoPoint startPoint = new GeoPoint(lati, longi);
+
+        if(center)
+        mapController.setCenter(startPoint);
+
+        Marker startMaker = new Marker(mMapView);
+        startMaker.setPosition(startPoint);
+        startMaker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        mMapView.getOverlays().add(startMaker);
+        startMaker.setIcon(getResources().getDrawable(R.drawable.ic_tourist_spots));
+        //startMaker.setTitle("Start point");
+        mMapView.invalidate();
+
+
+
+
+    }
+
+    /**
+     * Determines whether one Location reading is better than the current Location fix
+     * @param location  The new Location that you want to evaluate
+     * @param currentBestLocation  The current Location fix, to which you want to compare the new one
+     * @return true or false
+     */
+    private boolean isBetterLocation(Location location, Location currentBestLocation) {
+        if (currentBestLocation == null) {
+            // A new location is always better than no location
+            return true;
+        }
+
+        // Checke wether the new location fix is newer or older
+        long timeDelta = location.getTime() - currentBestLocation.getTime();
+        boolean isSignificantlyNewer = timeDelta > TWO_MINUTES;
+        boolean isSignificantlyOlder = timeDelta < -TWO_MINUTES;
+        boolean isNewer = timeDelta > 0;
+
+        // If it's been more than two minutes since the current location, use the new location
+        // because the user has likely moved
+        if (isSignificantlyNewer) {
+            return true;
+            // If the new location is more than two minutes older, it must be worse
+        } else if (isSignificantlyOlder) {
+            return false;
+        }
+
+        // Check whether the new location fix is more or less accurate
+        int accuracyDelta = (int) (location.getAccuracy() - currentBestLocation.getAccuracy());
+        boolean isLessAccurate = accuracyDelta > 0;
+        boolean isMoreAccurate = accuracyDelta < 0;
+        boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+        // Check if the old and new location are from the same provider
+        boolean isFromSameProvider = isSameProvider(location.getProvider(),
+                currentBestLocation.getProvider());
+
+        // Determine location quality using a combination of timeliness and accuracy
+        if (isMoreAccurate) {
+            return true;
+        } else if (isNewer && !isLessAccurate) {
+            return true;
+        } else if (isNewer && !isSignificantlyLessAccurate && isFromSameProvider) {
+            return true;
+        }
+        return false;
+
+
+
+    }
+
+    /** Checks whether two providers are the same */
+    private boolean isSameProvider(String provider1, String provider2) {
+        if (provider1 == null) {
+            return provider2 == null;
+        }
+        return provider1.equals(provider2);
+
+    }
+
+
+    private void makeUseOfNewLocation(Location location) {
+        if(isBetterLocation(location, lastKnownLocation)){
+            // if the new location is better, we change the reading of the last known location
+            // and stop collecting locations
+            lastKnownLocation = location;
+            locationManager.removeUpdates(locationListener);
+            setCurrentLocation(lastKnownLocation, true);
+        } else{
+            // or else we keep collecting
+            collectLocationSamples();
+
+
+
+            //something else
+        }
+    }
+
+    private void collectLocationSamples(){
+        if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            // Permission to access locations
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            // Register the listener with the Location Manager to receive location updates
+            // First parameter is type of location provider, in this case the provider is Network location
+            // for cell-tower and wifi based location
+            // second and third parameters relate to the frequency at which the the listener receives updates
+            // second param is the interval between notifications and third is the minimum change in distance
+            // between notifications. When both are set to 0, notifications come as frequently as possible
+            // the last parameter is the listener that receives callbacks for location updates
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+            // requesting updates from GPS
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+        }
     }
 
 
@@ -197,7 +396,6 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
      * @return void
      *
      */
-
     public void drawPath(GeoPoint start, GeoPoint end, boolean bycicle){
 
 
@@ -223,25 +421,6 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
         mMapView.getOverlays().add(roadOverlay);
         mMapView.invalidate();
 
-        /*
-        NominatimPOIProvider poiProvider = new NominatimPOIProvider("OSMBonusPackTutoUserAgent");
-        ArrayList<POI> pois = poiProvider.getPOIAlong(road.getRouteLow(), "fuel", 50, 2.0);
-
-        FolderOverlay poiMarkers = new FolderOverlay(this);
-        mMapView.getOverlays().add(poiMarkers);
-
-        Drawable poiIcon = getResources().getDrawable(R.drawable.ic_gas_pumps); // change this for other POIs
-        for(POI poi:pois){
-            Marker poiMarker = new Marker(mMapView);
-            poiMarker.setTitle(poi.mType);
-            poiMarker.setSnippet(poi.mDescription);
-            poiMarker.setPosition(poi.mLocation);
-            poiMarker.setIcon(poiIcon);
-            if (poi.mThumbnail != null){
-                poiMarker.setImage(new BitmapDrawable(poi.mThumbnail));
-            }
-            poiMarkers.add(poiMarker);
-        }*/
 
     }
 
