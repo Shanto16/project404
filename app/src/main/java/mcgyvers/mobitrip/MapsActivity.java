@@ -75,7 +75,7 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
 
 
     final int TWO_MINUTES = 1000 * 60 * 2; // interval between update requests
-    Location lastKnownLocation; // last known location for estimation purposes
+    Location lastKnownLocation = null; // last known location for estimation purposes
     LocationManager locationManager;
     LocationListener locationListener;
     IMapController mapController;
@@ -203,6 +203,7 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
 
                 //Called when a new location is found by the network location provider
                 makeUseOfNewLocation(location);
+                System.out.println("new location received");
             }
 
             @Override
@@ -223,8 +224,8 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
 
 
 
-
-        collectLocationSamples();
+        // start the collection of samples
+        collectLocationSamples(5000, 0);
 
 
 
@@ -340,24 +341,28 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
     }
 
 
+    /**
+     * compares two locations, the last known location and a fresh new
+     * provided in the location parameter, if the new one is better than the
+     * old one, set it on the map
+     *
+     * @param location new location fix from a location provider
+     */
     private void makeUseOfNewLocation(Location location) {
         if(isBetterLocation(location, lastKnownLocation)){
             // if the new location is better, we change the reading of the last known location
-            // and stop collecting locations
+            // and set the new one in the map
+            setCurrentLocation(location, true);
             lastKnownLocation = location;
-            locationManager.removeUpdates(locationListener);
-            setCurrentLocation(lastKnownLocation, true);
+
         } else{
-            // or else we keep collecting
-            collectLocationSamples();
-
-
-
-            //something else
+            // or else we set the old one in the map
+            setCurrentLocation(lastKnownLocation, true);
         }
+        drawPrefs("Hospital", lastKnownLocation);
     }
 
-    private void collectLocationSamples(){
+    private void collectLocationSamples(long interval, float distance){
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
             // Permission to access locations
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -377,9 +382,11 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
             // second param is the interval between notifications and third is the minimum change in distance
             // between notifications. When both are set to 0, notifications come as frequently as possible
             // the last parameter is the listener that receives callbacks for location updates
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
+
+            // setting time between updates to 5 seconds
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, interval, distance, locationListener);
             // requesting updates from GPS
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, interval, distance, locationListener);
 
         }
     }
@@ -390,18 +397,27 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
      * point of a trip. It implements the path into the global {@link MapView}
      * mMapView of the activity
      *
-     * @param start a GeoPoint object with start coordinates
-     * @param end GeoPoint with end coordinates
+     * @param start a Location object with start coordinates
+     * @param end Location with end coordinates
      * @param bycicle if a bycicle route is required
      * @return void
      *
      */
-    public void drawPath(GeoPoint start, GeoPoint end, boolean bycicle){
+    public void drawPath(Location start, Location end, boolean bycicle){
+
+        double lati = start.getLatitude();
+        double longi = start.getLongitude();
+
+        double lati1 = end.getLatitude();
+        double logi1 = end.getLongitude();
+
+        GeoPoint startPoint = new GeoPoint(lati, longi);
+        GeoPoint endPoint = new GeoPoint(lati1, logi1);
 
 
         ArrayList<GeoPoint> waypoints = new ArrayList<GeoPoint>();
-        waypoints.add(start);
-        waypoints.add(end);
+        waypoints.add(startPoint);
+        waypoints.add(endPoint);
 
 
         RoadManager roadManager;
@@ -429,11 +445,16 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
      * provided coordinates
      *
      * @param prefs name of the preference to be drawn in the map
-     * @param closeTo GeoPoint object to point where prefs should be drawn close to
+     * @param loc Location object to point where prefs should be drawn close to
      * @return void
      */
 
-    public void drawPrefs(String prefs, GeoPoint closeTo){
+    public void drawPrefs(String prefs, Location loc){
+
+        double lati = loc.getLatitude();
+        double logi = loc.getLongitude();
+
+        GeoPoint closeTo = new GeoPoint(lati, logi);
 
         NominatimPOIProvider poiProvider = new NominatimPOIProvider("OSMBonusPackTutoUserAgent");
         ArrayList<POI> pois = poiProvider.getPOICloseTo(closeTo, prefs, 50, 2.0);
@@ -459,7 +480,18 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        locationManager.removeUpdates(locationListener);
+        System.out.println("locations disabled");
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        collectLocationSamples(5000, 0);
+    }
 
     // ===========================================================
     // Getter & Setter
