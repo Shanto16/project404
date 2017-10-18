@@ -133,6 +133,59 @@ public class Current_trip extends Fragment {
 
 
 
+        hospitals.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                intent.putExtra("POI", "Hospital");
+                startActivity(intent);
+            }
+        });
+
+        policeStation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                intent.putExtra("POI", "Police");
+                startActivity(intent);
+            }
+        });
+
+        restaurants.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                intent.putExtra("POI", "Restaurant");
+                startActivity(intent);
+            }
+        });
+
+        hotels.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                intent.putExtra("POI", "Hotel");
+                startActivity(intent);
+            }
+        });
+
+        fuel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                intent.putExtra("POI", "Fuel");
+                startActivity(intent);
+            }
+        });
+
+        spots.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                intent.putExtra("POI", "Tourism");
+                startActivity(intent);
+            }
+        });
 
 
         expenseProgress.setPercent(pcnt);
@@ -201,7 +254,9 @@ public class Current_trip extends Fragment {
         maps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getContext(), MapsActivity.class));
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                intent.putExtra("POI", "");
+                startActivity(intent);
             }
         });
 
