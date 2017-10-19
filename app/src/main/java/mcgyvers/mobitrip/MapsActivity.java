@@ -2,12 +2,15 @@ package mcgyvers.mobitrip;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.os.Bundle;
@@ -20,6 +23,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.Toast;
 
 
 import org.osmdroid.api.IMapController;
@@ -79,7 +83,8 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
     LocationManager locationManager;
     LocationListener locationListener;
     IMapController mapController;
-    MapView map;
+
+    Drawable poiIcon;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -183,7 +188,7 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
         this.setContentView(rl);
 
 
-        // testing the GPS functionality:
+
         // Acquire a reference to the system Location Manager
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -224,8 +229,18 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
 
 
 
-        // start the collection of samples
-        collectLocationSamples(5000, 0);
+        if(isOnline()){
+            //if there is connection, start the collection of samples
+            collectLocationSamples(5000, 10);
+
+
+        } else{
+            // or use the last known location
+            Toast.makeText(getApplicationContext(), "Couldn't reach the servers", Toast.LENGTH_LONG);
+            setCurrentLocation(lastKnownLocation, true);
+
+        }
+
 
 
 
@@ -359,8 +374,85 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
             // or else we set the old one in the map
             setCurrentLocation(lastKnownLocation, true);
         }
-        drawPrefs("Hospital", lastKnownLocation);
+        plotPrefs();
+        //drawPrefs("Hospital", lastKnownLocation);
     }
+
+    /**
+     * plotPrefs() takes the POI(Point-of-Interest) parameters sent to MapsActivity
+     * by the Current_trip class and sets a different POI icon
+     * according to the name of the point and then calls drawPrefs()
+     * to plot all the chosen POIs into the map
+     */
+    private void plotPrefs(){
+        Intent intent = getIntent();
+        String prefs = intent.getStringExtra("POI");
+
+
+        switch (prefs){
+            case "Fuel":
+                poiIcon = getResources().getDrawable(R.drawable.ic_gas_pumps);
+                drawPrefs(prefs, lastKnownLocation);
+                break;
+
+            case "Hospital":
+                poiIcon = getResources().getDrawable(R.drawable.ic_hospitals);
+                drawPrefs(prefs, lastKnownLocation);
+                break;
+
+            case "Police":
+                poiIcon = getResources().getDrawable(R.drawable.ic_police_station);
+                drawPrefs(prefs, lastKnownLocation);
+                break;
+
+            case "Restaurant":
+                poiIcon = getResources().getDrawable(R.drawable.ic_restaurants);
+                drawPrefs(prefs, lastKnownLocation);
+                break;
+
+            case "Hotel":
+                poiIcon = getResources().getDrawable(R.drawable.ic_local_hotels);
+                drawPrefs(prefs, lastKnownLocation);
+                break;
+
+            case "Tourism":
+                poiIcon = getResources().getDrawable(R.drawable.ic_tourist_spots);
+                // i feel ashamed for the following set of code. TODO: plot those in async
+                drawPrefs("Attraction", lastKnownLocation);
+                drawPrefs("Camp site", lastKnownLocation);
+                drawPrefs("Caravan site", lastKnownLocation);
+                drawPrefs("Information", lastKnownLocation);
+                drawPrefs("Museum", lastKnownLocation);
+                drawPrefs("Picnic site", lastKnownLocation);
+                drawPrefs("Viewpoint", lastKnownLocation);
+                drawPrefs("Ruin", lastKnownLocation);
+                drawPrefs("Zoo", lastKnownLocation);
+                drawPrefs("Water park", lastKnownLocation);
+                break;
+
+            default:
+                break;
+
+
+        }
+
+        return;
+
+    }
+
+
+    /**
+     * function to check if there is internet connection needed for
+     * catching new locations
+     * @return true or false to wether there is connection or not
+     */
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
 
     private void collectLocationSamples(long interval, float distance){
         if(!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || !locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
@@ -462,7 +554,7 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
         FolderOverlay poiMarkers = new FolderOverlay(this);
         mMapView.getOverlays().add(poiMarkers);
 
-        Drawable poiIcon = getResources().getDrawable(R.drawable.ic_gas_pumps); // change this for other POIs
+        //Drawable poiIcon = getResources().getDrawable(R.drawable.ic_gas_pumps); // change this for other POIs
         for(POI poi:pois){
             Marker poiMarker = new Marker(mMapView);
             poiMarker.setTitle(poi.mType);
