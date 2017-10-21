@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="4dp"
+    >
+
+
+    <ImageView
+        android:id="@+id/IV_default_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_start_point"/>
+
+    <TextView
+        android:id="@+id/TV_place_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/IV_default_icon"
+        android:text="Dhaka, Bangladesh"
+        android:layout_marginTop="4dp"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/TV_place_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/TV_place_name"
+        android:layout_toEndOf="@+id/IV_default_icon"
+        android:text="63miles"
+        android:textSize="12sp"/>
+
+
+
+
+</RelativeLayout>

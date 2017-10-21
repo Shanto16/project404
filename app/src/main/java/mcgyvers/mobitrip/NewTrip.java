@@ -65,6 +65,29 @@ public class NewTrip extends Fragment {
         commonexpense = rootView.findViewById(R.id.common_expense);
 
 
+        from.setFocusable(false);
+        from.setKeyListener(null);
+
+        destination.setFocusable(false);
+        destination.setKeyListener(null);
+
+
+        from.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getActivity() , PlacePicker.class));
+            }
+        });
+
+
+        destination.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getActivity() , PlacePicker.class));
+            }
+        });
+
+
 
 
         trip_date.setManager(getFragmentManager());

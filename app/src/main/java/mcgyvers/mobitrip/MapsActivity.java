@@ -286,7 +286,7 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
         startMaker.setPosition(startPoint);
         startMaker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         mMapView.getOverlays().add(startMaker);
-        startMaker.setIcon(getResources().getDrawable(R.drawable.ic_tourist_spots));
+        startMaker.setIcon(getResources().getDrawable(R.drawable.ic_start_point));
         //startMaker.setTitle("Start point");
         mMapView.invalidate();
 
