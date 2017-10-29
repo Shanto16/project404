@@ -1,6 +1,7 @@
 package mcgyvers.mobitrip.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -31,7 +32,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
+import mcgyvers.mobitrip.NewTrip;
 import mcgyvers.mobitrip.R;
+import mcgyvers.mobitrip.dataModels.AtPlace;
+
 
 /**
  * Created by edson on 21/10/17.
@@ -39,21 +43,21 @@ import mcgyvers.mobitrip.R;
 
 public class ATAdapter extends RecyclerView.Adapter<ATAdapter.PredictionHolder> implements Filterable{
 
-    private ArrayList<AT_Place> myResultList;
+    private ArrayList<AtPlace> myResultList;
     private GoogleApiClient myApiClient;
     private LatLngBounds myBounds;
     private AutocompleteFilter myACFilter;
-
+    private final onItemClickListener clickListener;
     private Context context;
 
-    public ATAdapter(Context context,  GoogleApiClient googleApiClient, LatLngBounds latLngBounds, AutocompleteFilter autocompleteFilter){
+    public ATAdapter(Context context,  GoogleApiClient googleApiClient, LatLngBounds latLngBounds, AutocompleteFilter autocompleteFilter, onItemClickListener listener){
 
 
         this.context = context;
         this.myBounds = latLngBounds;
         this.myACFilter = autocompleteFilter;
         this.myApiClient = googleApiClient;
-
+        this.clickListener = listener;
         this.myResultList = new ArrayList<>();
 
     };
@@ -93,7 +97,7 @@ public class ATAdapter extends RecyclerView.Adapter<ATAdapter.PredictionHolder> 
     }
 
 
-    private ArrayList<AT_Place> getAutoComplete(CharSequence constraint){
+    private ArrayList<AtPlace> getAutoComplete(CharSequence constraint){
         if(myApiClient.isConnected()){
 
 
@@ -115,7 +119,7 @@ public class ATAdapter extends RecyclerView.Adapter<ATAdapter.PredictionHolder> 
             ArrayList resultList = new ArrayList<>(autocompletePredictions.getCount());
             while (iterator.hasNext()){
                 AutocompletePrediction prediction = iterator.next();
-                resultList.add(new AT_Place(prediction.getPlaceId(), prediction.getPrimaryText(null), prediction.getSecondaryText(null)));
+                resultList.add(new AtPlace(prediction.getPlaceId(), prediction.getPrimaryText(null), prediction.getSecondaryText(null)));
             }
 
             autocompletePredictions.release();
@@ -152,10 +156,9 @@ public class ATAdapter extends RecyclerView.Adapter<ATAdapter.PredictionHolder> 
     @Override
     public void onBindViewHolder(ATAdapter.PredictionHolder holder, int position) {
 
-        final Integer pos = position;
-        final AT_Place place = myResultList.get(position);
+        final AtPlace place = myResultList.get(position);
 
-        holder.placeName.setText(place.toString());
+        holder.placeName.setText(place.getName());
         holder.placeAddress.setText(place.getAdress());
         holder.placeItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -163,7 +166,7 @@ public class ATAdapter extends RecyclerView.Adapter<ATAdapter.PredictionHolder> 
 
                 Toast.makeText(context, "Fetching data...", Toast.LENGTH_SHORT);
                 PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
-                        .getPlaceById(myApiClient, place.placeId.toString());
+                        .getPlaceById(myApiClient, place.getPlaceId());
 
                 placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
                     @Override
@@ -172,16 +175,27 @@ public class ATAdapter extends RecyclerView.Adapter<ATAdapter.PredictionHolder> 
 
                             Place mPlace = places.get(0);
                             LatLng queriedLocation = mPlace.getLatLng();
+                            place.setCoords(queriedLocation);
 
+
+                            /*
                             Toast.makeText(context, "place latitude: " + queriedLocation.latitude + "\n" +
                                     "place longitude: " + queriedLocation.longitude + "\n" +
                                     "place name: " + place.toString() + "\n" +
                                     "address: " + place.getAdress(), Toast.LENGTH_SHORT).show();
 
+                            */
+                            places.release();
+                            clickListener.callback(place);
+
+
+
+
                         }
                         places.release();
                     }
                 });
+
 
 
 
@@ -200,28 +214,14 @@ public class ATAdapter extends RecyclerView.Adapter<ATAdapter.PredictionHolder> 
     }
 
 
-    public class AT_Place{
-        public CharSequence placeId;
-        public CharSequence description;
-        public CharSequence address;
 
 
+    public interface onItemClickListener{
 
-        AT_Place(CharSequence placeId, CharSequence description, CharSequence address) {
-            this.placeId = placeId;
-            this.description = description;
-            this.address = address;
-
-        }
-
-        public String toString(){
-            return description.toString();
-        }
-
-        public String getAdress(){
-            return address.toString();
-        }
+        public void callback(AtPlace place);
     }
+
+
 
 
 

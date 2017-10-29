@@ -1,5 +1,6 @@
 package mcgyvers.mobitrip;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -23,9 +24,10 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import mcgyvers.mobitrip.adapters.ATAdapter;
+import mcgyvers.mobitrip.dataModels.AtPlace;
 
 public class PlacePicker extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
-    GoogleApiClient.OnConnectionFailedListener, View.OnClickListener{
+    GoogleApiClient.OnConnectionFailedListener, View.OnClickListener, ATAdapter.onItemClickListener{
 
     EditText placePicker;
     RecyclerView places;
@@ -50,7 +52,7 @@ public class PlacePicker extends AppCompatActivity implements GoogleApiClient.Co
         layoutManager = new LinearLayoutManager(this);
         buildGoogleAPIClient();
 
-        mAtAdapter = new ATAdapter(getApplicationContext(), googleApiClient, myBounds, null);
+        mAtAdapter = new ATAdapter(getApplicationContext(), googleApiClient, myBounds, null, this);
 
         places.setLayoutManager(layoutManager);
         places.setItemAnimator(new DefaultItemAnimator());
@@ -85,6 +87,7 @@ public class PlacePicker extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     protected synchronized void buildGoogleAPIClient(){
+        // initilizing google API client
         googleApiClient = new GoogleApiClient
                 .Builder(this)
                 .addConnectionCallbacks(this)
@@ -117,6 +120,8 @@ public class PlacePicker extends AppCompatActivity implements GoogleApiClient.Co
     @Override
     protected void onResume() {
         super.onResume();
+        // when activity comes back from pause and resumes the API client from google
+        // must reconnect
         if(!googleApiClient.isConnected() && !googleApiClient.isConnecting()){
             googleApiClient.connect();
         }
@@ -125,8 +130,39 @@ public class PlacePicker extends AppCompatActivity implements GoogleApiClient.Co
     @Override
     protected void onPause() {
         super.onPause();
+        // if activity goes out of focus (pauses or suspends), the API is disconnected
         if(googleApiClient.isConnected()){
             googleApiClient.disconnect();
         }
+    }
+
+
+
+
+    /**
+     * callback from the click listener on the ATAdapter adapter, returns an AtPlace object
+     * containing name, address and coordinates for the selected item,
+     * @param place
+     */
+    @Override
+    public void callback(AtPlace place) {
+        //WHATS HAPPENING HEEEERE?!
+        Intent i = getIntent();
+        Intent intent = new Intent(getApplicationContext(), NewTrip.class);
+        //intent.putExtra("way", i.getStringExtra("way"));
+        //intent.putExtra("place latitude", place.getLatitude());
+        //intent.putExtra("place longitude", place.getLongitude());
+        //intent.putExtra("place name", place.toString());
+        //intent.putExtra("place address", place.getAdress());
+        if(googleApiClient.isConnected()){
+            googleApiClient.disconnect();
+        }
+
+
+        Toast.makeText(getApplicationContext(), "place latitude: " + place.getLatitude() + "\n" +
+                "place longitude: " + place.getLongitude() + "\n" +
+                "place name: " + place.getName() + "\n" +
+                "address: " + place.getAdress(), Toast.LENGTH_SHORT).show();
+        startActivity(intent);
     }
 }

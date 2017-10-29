@@ -9,6 +9,7 @@ import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -49,6 +50,13 @@ public class NewTrip extends Fragment {
     //Integer personalAmount;
     //Integer commonExpediture;
 
+    double originLongi, originLati = 0.0;
+    String originPlaceName, originPlaceAddress = "";
+
+
+    double destLongi, destLati = 0.0;
+    String destPlaceName, destPlaceAddress = "";
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -75,7 +83,9 @@ public class NewTrip extends Fragment {
         from.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getActivity() , PlacePicker.class));
+                Intent i = new Intent(getActivity(), PlacePicker.class);
+                i.putExtra("way", "origin");
+                startActivity(i);
             }
         });
 
@@ -83,7 +93,9 @@ public class NewTrip extends Fragment {
         destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getActivity() , PlacePicker.class));
+                Intent i = new Intent(getActivity(), PlacePicker.class);
+                i.putExtra("way", "destination");
+                startActivity(i);
             }
         });
 
@@ -139,9 +151,77 @@ public class NewTrip extends Fragment {
             }
         });
 
+        //getLocations();
+
 
 
         return rootView;
+    }
+
+    /*
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // this will save the location values (coordinates, place name or address)
+        // for origin or destination in order to not let them be lost when the activity is
+        // killed when the user goes to PlacePicker activity to pick a new place
+
+        outState.putDouble("originLati", originLati);
+        outState.putDouble("originLongi", originLongi);
+        outState.putDouble("destLati", destLati);
+        outState.putDouble("destLongi", destLongi);
+
+        outState.putString("originPlaceName", originPlaceName);
+        outState.putString("originPlaceAddress", originPlaceAddress);
+        outState.putString("destPlaceName", destPlaceName);
+        outState.putString("destPlaceAddress", destPlaceAddress);
+
+    }
+
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+
+        if(savedInstanceState != null){
+            originLati = savedInstanceState.getDouble("originLati");
+            originLongi = savedInstanceState.getDouble("originLongi");
+            destLati = savedInstanceState.getDouble("destLati");
+            destLongi = savedInstanceState.getDouble("destLongi");
+
+            originPlaceName = savedInstanceState.getString("originPlaceName");
+            originPlaceAddress = savedInstanceState.getString("originPlaceAddress");
+            destPlaceName = savedInstanceState.getString("destPlaceName");
+            destPlaceAddress = savedInstanceState.getString("destPlaceAddress");
+        }
+
+    }
+    */
+
+    void getLocations(){
+
+        Intent i = getActivity().getIntent();
+        String way = i.getStringExtra("way");
+        if(way != null){
+
+            if(way.equals("origin")){
+                originLati = i.getDoubleExtra("place longitude", 0.0);
+                originLongi = i.getDoubleExtra("place latitude", 0.0);
+                originPlaceName = i.getStringExtra("place name");
+                originPlaceAddress = i.getStringExtra("place address");
+
+                from.setText(originPlaceName);
+
+            } else if(way.equals("destination")){
+                destLati = i.getDoubleExtra("place longitude", 0.0);
+                destLongi = i.getDoubleExtra("place latitude", 0.0);
+                destPlaceName = i.getStringExtra("place name");
+                destPlaceAddress = i.getStringExtra("place address");
+
+                destination.setText(destPlaceName);
+            }
+        }
+
     }
 
     void createTrip(String date, String origin, String destination_s, Integer amount_s, Integer common_s, ArrayList<Member> members){
