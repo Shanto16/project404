@@ -1,8 +1,11 @@
 package mcgyvers.mobitrip;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -22,6 +25,7 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.LocationSource;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.gson.Gson;
 
 import mcgyvers.mobitrip.adapters.ATAdapter;
 import mcgyvers.mobitrip.dataModels.AtPlace;
@@ -37,7 +41,7 @@ public class PlacePicker extends AppCompatActivity implements GoogleApiClient.Co
     private static final LatLngBounds myBounds = new LatLngBounds(new LatLng(-0,0), new LatLng(0, 0));
 
     private ATAdapter mAtAdapter;
-    private LinearLayoutManager layoutManager;
+    LinearLayoutManager layoutManager;
     public AutocompleteFilter filter;
 
 
@@ -142,18 +146,31 @@ public class PlacePicker extends AppCompatActivity implements GoogleApiClient.Co
     /**
      * callback from the click listener on the ATAdapter adapter, returns an AtPlace object
      * containing name, address and coordinates for the selected item,
-     * @param place
+     * @param place AtPlace object
      */
     @Override
     public void callback(AtPlace place) {
-        //WHATS HAPPENING HEEEERE?!
+
         Intent i = getIntent();
-        Intent intent = new Intent(getApplicationContext(), NewTrip.class);
-        //intent.putExtra("way", i.getStringExtra("way"));
-        //intent.putExtra("place latitude", place.getLatitude());
-        //intent.putExtra("place longitude", place.getLongitude());
-        //intent.putExtra("place name", place.toString());
-        //intent.putExtra("place address", place.getAdress());
+
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        Gson gson = new Gson();
+        String location = gson.toJson(place);
+
+        if(i.getStringExtra("way").equals("origin")) {
+            editor.putString(MainActivity.ORIGIN, location);
+        } else if(i.getStringExtra("way").equals("destination")){
+            editor.putString(MainActivity.DESTINATION, location);
+        }else finish();
+
+        editor.apply();
+
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        Bundle b = new Bundle();
+        b.putInt("fragToLoad", R.id.nav_new_trips);
+
         if(googleApiClient.isConnected()){
             googleApiClient.disconnect();
         }

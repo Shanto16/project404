@@ -119,7 +119,7 @@ public class ATAdapter extends RecyclerView.Adapter<ATAdapter.PredictionHolder> 
             ArrayList resultList = new ArrayList<>(autocompletePredictions.getCount());
             while (iterator.hasNext()){
                 AutocompletePrediction prediction = iterator.next();
-                resultList.add(new AtPlace(prediction.getPlaceId(), prediction.getPrimaryText(null), prediction.getSecondaryText(null)));
+                resultList.add(new AtPlace(prediction.getPlaceId(), prediction.getPrimaryText(null).toString(), prediction.getSecondaryText(null).toString()));
             }
 
             autocompletePredictions.release();
@@ -175,7 +175,8 @@ public class ATAdapter extends RecyclerView.Adapter<ATAdapter.PredictionHolder> 
 
                             Place mPlace = places.get(0);
                             LatLng queriedLocation = mPlace.getLatLng();
-                            place.setCoords(queriedLocation);
+                            place.setLatitude(queriedLocation.latitude);
+                            place.setLongitude(queriedLocation.longitude);
 
 
                             /*
