@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     ActionBarDrawerToggle actionBarDrawerToggle;
     FragmentTransaction fragmentTransaction;
     NavigationView navView;
-    Bundle locations = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         if(b != null){ // if we are coming back from choosing a location in placePicker, open NewTrip and send bundle b with location params as argument
-            switchFragment(b.getInt("fragToLoad"), locations);
+            switchFragment(b.getInt("fragToLoad"));
 
         }
 
@@ -63,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-                switchFragment(item.getItemId(), null);
+                switchFragment(item.getItemId());
 
                 return false;
             }
@@ -72,13 +71,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void switchFragment(int n, Bundle args) {
+    private void switchFragment(int n) {
 
 
         switch (n) {
             case R.id.nav_new_trips:
                 NewTrip ft = new NewTrip();
-                ft.setArguments(args);
                 fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.main_container, ft);
                 fragmentTransaction.commit();

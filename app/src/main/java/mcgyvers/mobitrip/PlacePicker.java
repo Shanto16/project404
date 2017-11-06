@@ -170,6 +170,7 @@ public class PlacePicker extends AppCompatActivity implements GoogleApiClient.Co
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         Bundle b = new Bundle();
         b.putInt("fragToLoad", R.id.nav_new_trips);
+        intent.putExtras(b);
 
         if(googleApiClient.isConnected()){
             googleApiClient.disconnect();

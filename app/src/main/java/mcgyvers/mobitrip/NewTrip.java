@@ -205,6 +205,12 @@ public class NewTrip extends Fragment {
         long tripsN = sharedPreferences.getLong(getString(R.string.trip_count), 0);
         Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(++tripsN));
 
+        if(desti != null && or != null){
+            trip.setDestPlace(desti);
+            trip.setOriginPlace(or);
+        } else {
+            Toast.makeText(getContext(), "Origin and destination must be specified", Toast.LENGTH_SHORT).show();
+        }
 
 
         Editor editor = sharedPreferences.edit();
@@ -217,8 +223,8 @@ public class NewTrip extends Fragment {
             ArrayList<Trip> getAllTrips = gson.fromJson(tripArray, new TypeToken<ArrayList<Trip>>(){}.getType());
             for(int i = 0; i < getAllTrips.size(); i++){
                 if(!getAllTrips.get(i).isCompleted()){
-                    Toast.makeText(getContext(), "you currently have an ongoing trip", Toast.LENGTH_LONG).show();
-                    return;
+                    //Toast.makeText(getContext(), "you currently have an ongoing trip", Toast.LENGTH_LONG).show();
+                    //return;
                 }
             }
 
