@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -27,10 +28,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import io.blackbox_vision.datetimepickeredittext.view.DatePickerEditText;
+import mcgyvers.mobitrip.dataModels.AtPlace;
 import mcgyvers.mobitrip.dataModels.Member;
 import mcgyvers.mobitrip.dataModels.Trip;
 
@@ -50,12 +53,11 @@ public class NewTrip extends Fragment {
     //Integer personalAmount;
     //Integer commonExpediture;
 
-    double originLongi, originLati = 0.0;
-    String originPlaceName, originPlaceAddress = "";
+    SharedPreferences tmpShared;
+    SharedPreferences.Editor tmpEditor;
 
-
-    double destLongi, destLati = 0.0;
-    String destPlaceName, destPlaceAddress = "";
+    AtPlace or = null;
+    AtPlace desti = null;
 
 
     @Override
@@ -78,6 +80,26 @@ public class NewTrip extends Fragment {
 
         destination.setFocusable(false);
         destination.setKeyListener(null);
+
+
+        tmpShared = getActivity().getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
+        if(tmpShared != null){
+            Gson gson = new Gson();
+            String dest = tmpShared.getString(MainActivity.DESTINATION, "");
+            String origin = tmpShared.getString(MainActivity.ORIGIN,"");
+            if(!dest.equals("")){
+                desti = gson.fromJson(dest, AtPlace.class);
+                destination.setText(desti.getName() + ", " + desti.getAdress());
+            }
+
+            if(!origin.equals("")){
+                or = gson.fromJson(origin, AtPlace.class);
+                from.setText(or.getName() + ", " + or.getAdress());
+            }
+
+        }
+
+
 
 
         from.setOnClickListener(new View.OnClickListener() {
@@ -148,6 +170,18 @@ public class NewTrip extends Fragment {
                 }
 
 
+
+                tmpEditor = tmpShared.edit();
+                tmpEditor.clear();
+                tmpEditor.apply();
+
+                //---------------------delete
+                // send message to mainActivity to clean the savedInstance
+                Intent intent = new Intent(getActivity().getApplicationContext(), MainActivity.class);
+                intent.putExtra("MESSAGE","CLEAN");
+                startActivity(intent);
+                //--------------------------
+
             }
         });
 
@@ -158,71 +192,9 @@ public class NewTrip extends Fragment {
         return rootView;
     }
 
-    /*
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        // this will save the location values (coordinates, place name or address)
-        // for origin or destination in order to not let them be lost when the activity is
-        // killed when the user goes to PlacePicker activity to pick a new place
-
-        outState.putDouble("originLati", originLati);
-        outState.putDouble("originLongi", originLongi);
-        outState.putDouble("destLati", destLati);
-        outState.putDouble("destLongi", destLongi);
-
-        outState.putString("originPlaceName", originPlaceName);
-        outState.putString("originPlaceAddress", originPlaceAddress);
-        outState.putString("destPlaceName", destPlaceName);
-        outState.putString("destPlaceAddress", destPlaceAddress);
-
-    }
 
 
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
 
-        if(savedInstanceState != null){
-            originLati = savedInstanceState.getDouble("originLati");
-            originLongi = savedInstanceState.getDouble("originLongi");
-            destLati = savedInstanceState.getDouble("destLati");
-            destLongi = savedInstanceState.getDouble("destLongi");
-
-            originPlaceName = savedInstanceState.getString("originPlaceName");
-            originPlaceAddress = savedInstanceState.getString("originPlaceAddress");
-            destPlaceName = savedInstanceState.getString("destPlaceName");
-            destPlaceAddress = savedInstanceState.getString("destPlaceAddress");
-        }
-
-    }
-    */
-
-    void getLocations(){
-
-        Intent i = getActivity().getIntent();
-        String way = i.getStringExtra("way");
-        if(way != null){
-
-            if(way.equals("origin")){
-                originLati = i.getDoubleExtra("place longitude", 0.0);
-                originLongi = i.getDoubleExtra("place latitude", 0.0);
-                originPlaceName = i.getStringExtra("place name");
-                originPlaceAddress = i.getStringExtra("place address");
-
-                from.setText(originPlaceName);
-
-            } else if(way.equals("destination")){
-                destLati = i.getDoubleExtra("place longitude", 0.0);
-                destLongi = i.getDoubleExtra("place latitude", 0.0);
-                destPlaceName = i.getStringExtra("place name");
-                destPlaceAddress = i.getStringExtra("place address");
-
-                destination.setText(destPlaceName);
-            }
-        }
-
-    }
 
     void createTrip(String date, String origin, String destination_s, Integer amount_s, Integer common_s, ArrayList<Member> members){
 
@@ -233,6 +205,12 @@ public class NewTrip extends Fragment {
         long tripsN = sharedPreferences.getLong(getString(R.string.trip_count), 0);
         Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(++tripsN));
 
+        if(desti != null && or != null){
+            trip.setDestPlace(desti);
+            trip.setOriginPlace(or);
+        } else {
+            Toast.makeText(getContext(), "Origin and destination must be specified", Toast.LENGTH_SHORT).show();
+        }
 
 
         Editor editor = sharedPreferences.edit();
@@ -245,8 +223,8 @@ public class NewTrip extends Fragment {
             ArrayList<Trip> getAllTrips = gson.fromJson(tripArray, new TypeToken<ArrayList<Trip>>(){}.getType());
             for(int i = 0; i < getAllTrips.size(); i++){
                 if(!getAllTrips.get(i).isCompleted()){
-                    Toast.makeText(getContext(), "you currently have an ongoing trip", Toast.LENGTH_LONG).show();
-                    return;
+                    //Toast.makeText(getContext(), "you currently have an ongoing trip", Toast.LENGTH_LONG).show();
+                    //return;
                 }
             }
 

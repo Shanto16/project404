@@ -1,7 +1,11 @@
 package mcgyvers.mobitrip;
 
+import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
@@ -19,18 +23,22 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String ORIGIN = "origin";
+    public static final String DESTINATION = "destination";
+    public static final String TMP_PREFS = "mobi_trip_prefs_TEMP";
+
     Toolbar mainToolbar;
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle actionBarDrawerToggle;
     FragmentTransaction fragmentTransaction;
     NavigationView navView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mainToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mainToolbar);
+
 
 
         navView = (NavigationView) findViewById(R.id.navigationView);
@@ -44,62 +52,80 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
         getSupportActionBar().setTitle("Current Trip");
 
+        Bundle b = getIntent().getExtras();
+        if(b != null){ // if we are coming back from choosing a location in placePicker, open NewTrip and send bundle b with location params as argument
+            switchFragment(b.getInt("fragToLoad"));
+
+        }
+
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 
-                switch (item.getItemId()) {
-                    case R.id.nav_new_trips:
-                        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.main_container, new NewTrip());
-                        fragmentTransaction.commit();
-                        getSupportActionBar().setTitle("New Trip");
-                        item.setChecked(true);
-                        drawerLayout.closeDrawers();
-                        break;
+                switchFragment(item.getItemId());
 
-                    case R.id.nav_your_trips:
-                        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.main_container, new YourTrips());
-                        fragmentTransaction.commit();
-                        getSupportActionBar().setTitle("Your Trips");
-                        item.setChecked(true);
-                        drawerLayout.closeDrawers();
-                        break;
-
-                    case R.id.nav_profile:
-                        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.main_container, new Profile());
-                        fragmentTransaction.commit();
-                        getSupportActionBar().setTitle("Profile");
-                        item.setChecked(true);
-                        drawerLayout.closeDrawers();
-                        break;
-
-                    case R.id.nav_settings:
-                        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.main_container, new Settings());
-                        fragmentTransaction.commit();
-                        getSupportActionBar().setTitle("Settings");
-                        item.setChecked(true);
-                        drawerLayout.closeDrawers();
-                        break;
-
-                    case R.id.nav_current_trip:
-                        fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        fragmentTransaction.replace(R.id.main_container, new Current_trip());
-                        fragmentTransaction.commit();
-                        getSupportActionBar().setTitle("Current Trip");
-                        item.setChecked(true);
-                        drawerLayout.closeDrawers();
-                        break;
-
-                }
                 return false;
             }
         });
 
     }
+
+
+    private void switchFragment(int n) {
+
+
+        switch (n) {
+            case R.id.nav_new_trips:
+                NewTrip ft = new NewTrip();
+                fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.main_container, ft);
+                fragmentTransaction.commit();
+                getSupportActionBar().setTitle("New Trip");
+                //item.setChecked(true);
+                drawerLayout.closeDrawers();
+                break;
+
+            case R.id.nav_your_trips:
+                fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.main_container, new YourTrips());
+                fragmentTransaction.commit();
+                getSupportActionBar().setTitle("Your Trips");
+                //item.setChecked(true);
+                drawerLayout.closeDrawers();
+                break;
+
+            case R.id.nav_profile:
+                fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.main_container, new Profile());
+                fragmentTransaction.commit();
+                getSupportActionBar().setTitle("Profile");
+                //item.setChecked(true);
+                drawerLayout.closeDrawers();
+                break;
+
+            case R.id.nav_settings:
+                fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.main_container, new Settings());
+                fragmentTransaction.commit();
+                getSupportActionBar().setTitle("Settings");
+                //item.setChecked(true);
+                drawerLayout.closeDrawers();
+                break;
+
+            case R.id.nav_current_trip:
+                fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.main_container, new Current_trip());
+                fragmentTransaction.commit();
+                getSupportActionBar().setTitle("Current Trip");
+                //item.setChecked(true);
+                drawerLayout.closeDrawers();
+                break;
+
+        }
+
+
+    }
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -129,5 +155,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 2000);
     }
+
 
 }
