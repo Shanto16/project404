@@ -47,6 +47,7 @@ import org.osmdroid.views.overlay.mylocation.SimpleLocationOverlay;
 
 import java.util.ArrayList;
 
+import mcgyvers.mobitrip.dataModels.Trip;
 import mcgyvers.mobitrip.interfaces.OpenStreetMapConstants;
 
 public class MapsActivity extends AppCompatActivity implements OpenStreetMapConstants {
@@ -85,6 +86,8 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
     IMapController mapController;
 
     Drawable poiIcon;
+
+    Trip currentTrip = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -207,7 +210,10 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
             public void onLocationChanged(Location location) {
 
                 //Called when a new location is found by the network location provider
-                makeUseOfNewLocation(location);
+                if(currentTrip.getOriginPlace() == null){
+                    makeUseOfNewLocation(location);
+                }
+
                 System.out.println("new location received");
             }
 
@@ -241,6 +247,19 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
 
         }
 
+
+        currentTrip = Current_trip.getCurrentTrip(getApplicationContext(), getString(R.string.preference_file_key), getString(R.string.trips_array));
+        if(currentTrip != null && currentTrip.getOriginPlace()!= null){
+            Location origin = new Location("");
+            Location destination = new Location("");
+            origin.setLatitude(currentTrip.getOriginPlace().getLatitude());
+            origin.setLongitude(currentTrip.getOriginPlace().getLongitude());
+            destination.setLatitude(currentTrip.getDestPlace().getLatitude());
+            destination.setLongitude(currentTrip.getDestPlace().getLongitude());
+
+            setCurrentLocation(origin, true);
+            drawPath(origin, destination, false);
+        }
 
 
 

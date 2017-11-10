@@ -56,7 +56,10 @@ public class TripData extends RecyclerView.Adapter<TripData.MyViewHolder> {
         System.out.println("adapter trip origin: ");
         System.out.println(trip.getOrigin());
 
-        holder.trip_name.setText(trip.getOrigin() + " - " + trip.getDestination());
+        if(trip.getOriginPlace() != null){
+            holder.trip_name.setText(trip.getOriginPlace().getName() + " - " + trip.getDestPlace().getName());
+        }else holder.trip_name.setText(trip.getOrigin() + " - " + trip.getDestination());
+
         holder.trip_date.setText(trip.getDate());
         holder.trip_expense.setText("$"+String.valueOf(trip.getAmount()));
         holder.trip_members.setText("0");
