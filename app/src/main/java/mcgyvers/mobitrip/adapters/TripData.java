@@ -71,7 +71,7 @@ public class TripData extends RecyclerView.Adapter<TripData.MyViewHolder> {
                 //context.startActivity(new Intent(context, Current_trip_member_information.class));
             }
         });
-        //holder.trip_bg.setImageResource();
+        //holder.trip_bg.setImageResource();//
 
 
     }
