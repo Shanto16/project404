@@ -26,6 +26,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String ORIGIN = "origin";
     public static final String DESTINATION = "destination";
     public static final String TMP_PREFS = "mobi_trip_prefs_TEMP";
+    public static final String AMOUNT = "amount";
+    public static final String COMMONEXP = "commonExp";
+    public static final String TRIPDATE = "tripdate";
+    public static final String MEMBERS = "members";
+    public static final String TRIPID = "tripId";
 
     Toolbar mainToolbar;
     DrawerLayout drawerLayout;

@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.rengwuxian.materialedittext.MaterialEditText;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import jp.wasabeef.recyclerview.animators.SlideInDownAnimator;
@@ -56,9 +57,9 @@ public class Current_trip_member_information extends AppCompatActivity implement
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
 
-    Trip currentTrip;
-    ArrayList<Trip> cTrips = new ArrayList<>();
-    int tripId;
+    //Trip currentTrip;
+    //ArrayList<Trip> cTrips = new ArrayList<>();
+    //int tripId;
 
 
 
@@ -106,8 +107,8 @@ public class Current_trip_member_information extends AppCompatActivity implement
         membersInformation.setItemAnimator(new DefaultItemAnimator());
         membersInformation.setAdapter(mAdapter);
 
-        sharedPreferences = this.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
+         sharedPreferences = getApplicationContext().getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
+         //editor = sharedPreferences.edit();
 
         //getCurrentTrip();
         memberCard.setVisibility(View.VISIBLE);//
@@ -153,26 +154,41 @@ public class Current_trip_member_information extends AppCompatActivity implement
 
     }
 
+    /**
+     * save all the data referring to members of the trip to the TMP_PREFS temporary file
+     * for posterior handling
+     */
     private void saveItAll() {
-        currentTrip.setMembers(memberList);
-        cTrips.set(tripId, currentTrip);
-        Gson gson = new Gson();
-        String tripsArray = gson.toJson(cTrips, new TypeToken<ArrayList<Trip>>(){}.getType());
+        // we'll write the data to the temporary file
+        editor = sharedPreferences.edit();
 
-        editor.putString(getString(R.string.trips_array), tripsArray);
+
+        Gson gson = new Gson();
+
+        String membersArray = gson.toJson(memberList, new TypeToken<ArrayList<Member>>(){}.getType());
+        editor.putString(MainActivity.MEMBERS, membersArray);
         editor.apply();
-        System.out.println(tripsArray);
+
+        System.out.println(membersArray);
         Toast.makeText(getApplicationContext(), "Users saved!", Toast.LENGTH_LONG).show();
         finish();
 
 
     }
 
+    /**
+     * Creates a member object and add it to the recyclerView adapter
+     * erasing the data fields afterwards
+     * @param nameS name of the user
+     * @param phoneS phone number of user
+     * @param amountS amount of money
+     */
     private void addNewMember(String nameS, String phoneS, String amountS ) {
+        //TODO: check for empty variables and make sure they cont cause crashes
         Member member = new Member(nameS, phoneS, amountS);
         int pos = memberList.size();
         memberList.add(member);
-        mAdapter.notifyItemInserted(pos);
+        mAdapter.notifyItemInserted(pos); // does this work?
         name.setText("");
         contact_num.setText("");
         amount.setText("");
@@ -183,30 +199,40 @@ public class Current_trip_member_information extends AppCompatActivity implement
     }
 
 
+    /**
+     * gets the list of members currently registered on the TEMP_PREFS temporary local
+     * storage file for the trip being set
+     */
     private void setData() {
-        currentTrip = getCurrentTrip();
-        memberList.addAll(currentTrip.getMembers());
+
+        String data = sharedPreferences.getString(MainActivity.MEMBERS, "[]");
+        memberList.addAll(getMembers(getApplicationContext()));
+        //Gson gson = new Gson();
+        //ArrayList<Member> m = gson.fromJson(data,new TypeToken<ArrayList<Member>>(){}.getType());
+        //memberList.addAll(m);
+
+
+        //memberList.addAll(currentTrip.getMembers());
         mAdapter.notifyDataSetChanged();
-        System.out.println("list of current trip members " + currentTrip.getMembers().size());
         System.out.println("list of members are " + memberList.size());
         System.out.println("members are now " +  mAdapter.getItemCount());
 
 
     }
 
-    private Trip getCurrentTrip() {
-        String data = sharedPreferences.getString(getString(R.string.trips_array), "[]");
-        Gson gson = new Gson();
-        Trip trip = null;
-        cTrips = gson.fromJson(data, new TypeToken<ArrayList<Trip>>(){}.getType());
-        for(tripId = 0; tripId < cTrips.size(); tripId++){
-            if(!cTrips.get(tripId).isCompleted()){
-                trip = cTrips.get(tripId);
-                return trip;
-            }
-        }
+    /**
+     * retrieves the member array from the TMP_PREFS temporary local storage file
+     * @param context current application context
+     * @return array list of member objects
+     */
+    public static ArrayList<Member> getMembers(Context context){
 
-        return trip;
+        SharedPreferences sharedPreferences = context.getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
+        String data = sharedPreferences.getString(MainActivity.MEMBERS, "[]");
+        Gson gson = new Gson();
+        return gson.fromJson(data,new TypeToken<ArrayList<Member>>(){}.getType());
+
+
 
     }
 

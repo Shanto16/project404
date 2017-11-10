@@ -82,6 +82,7 @@ public class NewTrip extends Fragment {
         destination.setKeyListener(null);
 
 
+
         tmpShared = getActivity().getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
         if(tmpShared != null){
             Gson gson = new Gson();
@@ -105,6 +106,7 @@ public class NewTrip extends Fragment {
         from.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                saveCurrentConfigs();
                 Intent i = new Intent(getActivity(), PlacePicker.class);
                 i.putExtra("way", "origin");
                 startActivity(i);
@@ -115,6 +117,7 @@ public class NewTrip extends Fragment {
         destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                saveCurrentConfigs();
                 Intent i = new Intent(getActivity(), PlacePicker.class);
                 i.putExtra("way", "destination");
                 startActivity(i);
@@ -175,21 +178,30 @@ public class NewTrip extends Fragment {
                 tmpEditor.clear();
                 tmpEditor.apply();
 
-                //---------------------delete
-                // send message to mainActivity to clean the savedInstance
-                Intent intent = new Intent(getActivity().getApplicationContext(), MainActivity.class);
-                intent.putExtra("MESSAGE","CLEAN");
-                startActivity(intent);
-                //--------------------------
-
             }
         });
 
-        //getLocations();
-
-
 
         return rootView;
+    }
+
+
+    /**
+     * saves current configurations of trip to the temporary trip file
+     */
+    void saveCurrentConfigs(){
+
+        tmpShared = getActivity().getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
+        tmpEditor = tmpShared.edit();
+
+        tmpEditor.putString(MainActivity.AMOUNT, amount.getText().toString());
+        tmpEditor.putString(MainActivity.COMMONEXP, commonexpense.getText().toString());
+        tmpEditor.putString(MainActivity.TRIPDATE, trip_date.toString());
+
+
+        tmpEditor.apply();
+
+
     }
 
 
@@ -198,12 +210,18 @@ public class NewTrip extends Fragment {
 
     void createTrip(String date, String origin, String destination_s, Integer amount_s, Integer common_s, ArrayList<Member> members){
 
+
+
         Context context = getActivity();
         //getting the handle of sharedpreferences to store the due values
         SharedPreferences sharedPreferences = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         //getting the number of trips currently in store in order to creat an id for the new trip
         long tripsN = sharedPreferences.getLong(getString(R.string.trip_count), 0);
         Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(++tripsN));
+
+        //getting the list of members currently on the temporary trip file
+        ArrayList<Member> m = Current_trip_member_information.getMembers(getContext());
+        trip.setMembers(m);
 
         if(desti != null && or != null){
             trip.setDestPlace(desti);
@@ -254,7 +272,9 @@ public class NewTrip extends Fragment {
 
     }
 
-
-
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        saveCurrentConfigs();
+    }
 }
