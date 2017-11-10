@@ -5,6 +5,7 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -31,16 +32,22 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.timqi.sectorprogressview.ColorfulRingProgressView;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import mcgyvers.mobitrip.dataModels.Trip;
 
 import static mcgyvers.mobitrip.R.id.place_autocomplete_prediction_primary_text;
 import static mcgyvers.mobitrip.R.id.toolbar;
 
 /**
  * Created by Shanto on 9/7/2017.
+ * Class for displaying data about the latest trip
  */
 
 public class Current_trip extends Fragment {
@@ -52,6 +59,8 @@ public class Current_trip extends Fragment {
     TextView _expense,spent,currentLocation, temp,weather;
     ColorfulRingProgressView expenseProgress;
     Toolbar mToolbar;
+
+    Trip currentTrip = null;
 
     private static final int MY_PERMISSION_REQUEST_LOCATION=1;
 
@@ -288,6 +297,7 @@ public class Current_trip extends Fragment {
         maps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Intent intent = new Intent(getContext(), MapsActivity.class);
                 intent.putExtra("POI", "");
                 startActivity(intent);
@@ -295,7 +305,30 @@ public class Current_trip extends Fragment {
         });
 
 
+        currentTrip = getCurrentTrip(getContext(), getString(R.string.preference_file_key), getString(R.string.trips_array));
+
+
         return rootView;
+    }
+
+    /**
+     * Method for returning a trip object containing the latest created trip.
+     * It fetches the array list of all the trips on the device, and returns only
+     * the first element on the list, if it exists.
+     * @return Trip object
+     */
+    public static Trip getCurrentTrip(Context context, String prefs, String tripsArray) {
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(prefs, Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String tripArray = sharedPreferences.getString(tripsArray, "[]");
+        if(!tripArray.isEmpty()){
+            ArrayList<Trip> allTrips = gson.fromJson(tripArray, new TypeToken<ArrayList<Trip>>(){}.getType());
+            Trip ret = allTrips.get(allTrips.size() - 1);
+            return ret;
+        } else return null;
+
+
     }
 
 

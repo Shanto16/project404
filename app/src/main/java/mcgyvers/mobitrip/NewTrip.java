@@ -9,6 +9,7 @@ import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -18,6 +19,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -26,10 +28,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Locale;
 
 import io.blackbox_vision.datetimepickeredittext.view.DatePickerEditText;
+import mcgyvers.mobitrip.dataModels.AtPlace;
 import mcgyvers.mobitrip.dataModels.Member;
 import mcgyvers.mobitrip.dataModels.Trip;
 
@@ -48,6 +52,12 @@ public class NewTrip extends Fragment {
     DatePickerEditText trip_date;
     //Integer personalAmount;
     //Integer commonExpediture;
+
+    SharedPreferences tmpShared;
+    SharedPreferences.Editor tmpEditor;
+
+    AtPlace or = null;
+    AtPlace desti = null;
 
 
     @Override
@@ -72,10 +82,34 @@ public class NewTrip extends Fragment {
         destination.setKeyListener(null);
 
 
+
+        tmpShared = getActivity().getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
+        if(tmpShared != null){
+            Gson gson = new Gson();
+            String dest = tmpShared.getString(MainActivity.DESTINATION, "");
+            String origin = tmpShared.getString(MainActivity.ORIGIN,"");
+            if(!dest.equals("")){
+                desti = gson.fromJson(dest, AtPlace.class);
+                destination.setText(desti.getName() + ", " + desti.getAdress());
+            }
+
+            if(!origin.equals("")){
+                or = gson.fromJson(origin, AtPlace.class);
+                from.setText(or.getName() + ", " + or.getAdress());
+            }
+
+        }
+
+
+
+
         from.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getActivity() , PlacePicker.class));
+                saveCurrentConfigs();
+                Intent i = new Intent(getActivity(), PlacePicker.class);
+                i.putExtra("way", "origin");
+                startActivity(i);
             }
         });
 
@@ -83,7 +117,10 @@ public class NewTrip extends Fragment {
         destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getActivity() , PlacePicker.class));
+                saveCurrentConfigs();
+                Intent i = new Intent(getActivity(), PlacePicker.class);
+                i.putExtra("way", "destination");
+                startActivity(i);
             }
         });
 
@@ -136,15 +173,44 @@ public class NewTrip extends Fragment {
                 }
 
 
+
+                tmpEditor = tmpShared.edit();
+                tmpEditor.clear();
+                tmpEditor.apply();
+
             }
         });
-
 
 
         return rootView;
     }
 
+
+    /**
+     * saves current configurations of trip to the temporary trip file
+     */
+    void saveCurrentConfigs(){
+
+        tmpShared = getActivity().getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
+        tmpEditor = tmpShared.edit();
+
+        tmpEditor.putString(MainActivity.AMOUNT, amount.getText().toString());
+        tmpEditor.putString(MainActivity.COMMONEXP, commonexpense.getText().toString());
+        tmpEditor.putString(MainActivity.TRIPDATE, trip_date.toString());
+
+
+        tmpEditor.apply();
+
+
+    }
+
+
+
+
+
     void createTrip(String date, String origin, String destination_s, Integer amount_s, Integer common_s, ArrayList<Member> members){
+
+
 
         Context context = getActivity();
         //getting the handle of sharedpreferences to store the due values
@@ -153,6 +219,16 @@ public class NewTrip extends Fragment {
         long tripsN = sharedPreferences.getLong(getString(R.string.trip_count), 0);
         Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(++tripsN));
 
+        //getting the list of members currently on the temporary trip file
+        ArrayList<Member> m = Current_trip_member_information.getMembers(getContext());
+        trip.setMembers(m);
+
+        if(desti != null && or != null){
+            trip.setDestPlace(desti);
+            trip.setOriginPlace(or);
+        } else {
+            Toast.makeText(getContext(), "Origin and destination must be specified", Toast.LENGTH_SHORT).show();
+        }
 
 
         Editor editor = sharedPreferences.edit();
@@ -165,8 +241,8 @@ public class NewTrip extends Fragment {
             ArrayList<Trip> getAllTrips = gson.fromJson(tripArray, new TypeToken<ArrayList<Trip>>(){}.getType());
             for(int i = 0; i < getAllTrips.size(); i++){
                 if(!getAllTrips.get(i).isCompleted()){
-                    Toast.makeText(getContext(), "you currently have an ongoing trip", Toast.LENGTH_LONG).show();
-                    return;
+                    //Toast.makeText(getContext(), "you currently have an ongoing trip", Toast.LENGTH_LONG).show();
+                    //return;
                 }
             }
 
@@ -196,7 +272,9 @@ public class NewTrip extends Fragment {
 
     }
 
-
-
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        saveCurrentConfigs();
+    }
 }

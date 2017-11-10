@@ -19,6 +19,9 @@ public class Trip {
     private String date;
     private boolean completed;
 
+    private AtPlace destPlace;
+    private AtPlace originPlace;
+
 
     private ArrayList<Member> members;
 
@@ -37,24 +40,11 @@ public class Trip {
         this.tripId = tripId; //later on generate them upon checking the local storage
     }
 
-    /*
-    public JSONObject getTripJson(){
-        JSONObject trip = new JSONObject();
-        try{
-            trip.put("tripId", this.tripId);
-            trip.put("origin", this.origin);
-            trip.put("destination", this.destination);
-            //trip.put("coverPic", this.coverPic);
-            trip.put("amount", this.amount);
-            trip.put("commomExp", this.commonExp);
-            trip.put("date", this.date);
-            //trip.put("completed", this.completed);
-        } catch (JSONException e){
-            e.printStackTrace();
-        }
+    public void setDestPlace(AtPlace destPlace){ this.destPlace = destPlace;}
+    public void setOriginPlace(AtPlace originPlace){ this.originPlace = originPlace;}
 
-        return  trip;
-    }*/
+    public AtPlace getDestPlace(){return this.destPlace;}
+    public AtPlace getOriginPlace(){return this.originPlace;}
 
     public String getTripId() {
         return tripId;
