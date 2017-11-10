@@ -30,6 +30,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import io.blackbox_vision.datetimepickeredittext.view.DatePickerEditText;
@@ -132,22 +133,7 @@ public class NewTrip extends Fragment {
         members.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: encapsulate this code
-                String tdate = "";
-                String fr = "";
-                String dest = "";
-
-                fr = from.getText().toString();
-                tdate = trip_date.getText().toString();
-                dest = destination.getText().toString();
-
-                if(tdate.equals("") || fr.equals("") || dest.equals("")){
-                    Toast.makeText(getContext(), "Locations and date fields must be filled", Toast.LENGTH_LONG).show();
-                }else{
-                    createTrip(tdate, fr, dest ,Integer.parseInt(amount.getText().toString()),
-                            Integer.parseInt(commonexpense.getText().toString()), null);
-                }
-
+                saveCurrentConfigs();
                 startActivity(new Intent(getActivity(),Current_trip_member_information.class));
 
             }
@@ -213,15 +199,22 @@ public class NewTrip extends Fragment {
 
 
         Context context = getActivity();
+
         //getting the handle of sharedpreferences to store the due values
         SharedPreferences sharedPreferences = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+
+        Date date1 = new Date();
+        long tripId = date1.getTime();
         //getting the number of trips currently in store in order to creat an id for the new trip
         long tripsN = sharedPreferences.getLong(getString(R.string.trip_count), 0);
-        Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(++tripsN));
+        Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(tripId));
 
         //getting the list of members currently on the temporary trip file
         ArrayList<Member> m = Current_trip_member_information.getMembers(getContext());
         trip.setMembers(m);
+
+
+
 
         if(desti != null && or != null){
             trip.setDestPlace(desti);
