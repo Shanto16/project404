@@ -322,11 +322,11 @@ public class Current_trip extends Fragment {
         SharedPreferences sharedPreferences = context.getSharedPreferences(prefs, Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String tripArray = sharedPreferences.getString(tripsArray, "[]");
-        if(!tripArray.isEmpty()){
-            ArrayList<Trip> allTrips = gson.fromJson(tripArray, new TypeToken<ArrayList<Trip>>(){}.getType());
-            Trip ret = allTrips.get(allTrips.size() - 1);
-            return ret;
+        ArrayList<Trip> allTrips = gson.fromJson(tripArray, new TypeToken<ArrayList<Trip>>(){}.getType());
+        if(allTrips.size() > 0){
+            return allTrips.get(allTrips.size() - 1);
         } else return null;
+
 
 
     }
