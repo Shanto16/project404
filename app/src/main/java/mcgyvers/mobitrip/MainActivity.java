@@ -2,6 +2,7 @@ package mcgyvers.mobitrip;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     ActionBarDrawerToggle actionBarDrawerToggle;
     FragmentTransaction fragmentTransaction;
     NavigationView navView;
+    TextView tool_txt;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +49,13 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
+        tool_txt = findViewById(R.id.toolbarTXT);
         navView = (NavigationView) findViewById(R.id.navigationView);
+
+        Typeface amaranth = Typeface.createFromAsset(getAssets(), "fonts/Amaranth-Bold.ttf");
+        tool_txt.setTypeface(amaranth);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, mainToolbar, R.string.drawer_open, R.string.drawer_close);
@@ -85,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.main_container, ft);
                 fragmentTransaction.commit();
-                getSupportActionBar().setTitle("New Trip");
+                tool_txt.setText("New Trip");
+                getSupportActionBar().setTitle("");
                 //item.setChecked(true);
                 drawerLayout.closeDrawers();
                 break;
@@ -94,7 +104,8 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.main_container, new YourTrips());
                 fragmentTransaction.commit();
-                getSupportActionBar().setTitle("Your Trips");
+                tool_txt.setText("Your Trips");
+                getSupportActionBar().setTitle("");
                 //item.setChecked(true);
                 drawerLayout.closeDrawers();
                 break;
@@ -103,7 +114,9 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.main_container, new Profile());
                 fragmentTransaction.commit();
-                getSupportActionBar().setTitle("Profile");
+                tool_txt.setText("Profile");
+                getSupportActionBar().setTitle("");
+
                 //item.setChecked(true);
                 drawerLayout.closeDrawers();
                 break;
@@ -112,7 +125,9 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.main_container, new Settings());
                 fragmentTransaction.commit();
-                getSupportActionBar().setTitle("Settings");
+                tool_txt.setText("Settings");
+                getSupportActionBar().setTitle("");
+
                 //item.setChecked(true);
                 drawerLayout.closeDrawers();
                 break;
@@ -121,7 +136,9 @@ public class MainActivity extends AppCompatActivity {
                 fragmentTransaction = getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.replace(R.id.main_container, new Current_trip());
                 fragmentTransaction.commit();
-                getSupportActionBar().setTitle("Current Trip");
+                tool_txt.setText("Current Trip");
+                getSupportActionBar().setTitle("");
+
                 //item.setChecked(true);
                 drawerLayout.closeDrawers();
                 break;
