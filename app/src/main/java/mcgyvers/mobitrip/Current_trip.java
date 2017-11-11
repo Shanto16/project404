@@ -314,7 +314,7 @@ public class Current_trip extends Fragment {
     /**
      * Method for returning a trip object containing the latest created trip.
      * It fetches the array list of all the trips on the device, and returns only
-     * the first element on the list, if it exists.
+     * the first element on the list, if it exists
      * @return Trip object
      */
     public static Trip getCurrentTrip(Context context, String prefs, String tripsArray) {
@@ -322,11 +322,11 @@ public class Current_trip extends Fragment {
         SharedPreferences sharedPreferences = context.getSharedPreferences(prefs, Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String tripArray = sharedPreferences.getString(tripsArray, "[]");
-        if(!tripArray.isEmpty()){
-            ArrayList<Trip> allTrips = gson.fromJson(tripArray, new TypeToken<ArrayList<Trip>>(){}.getType());
-            Trip ret = allTrips.get(allTrips.size() - 1);
-            return ret;
+        ArrayList<Trip> allTrips = gson.fromJson(tripArray, new TypeToken<ArrayList<Trip>>(){}.getType());
+        if(allTrips.size() > 0){
+            return allTrips.get(allTrips.size() - 1);
         } else return null;
+
 
 
     }

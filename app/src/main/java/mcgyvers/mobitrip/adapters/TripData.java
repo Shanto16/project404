@@ -61,8 +61,10 @@ public class TripData extends RecyclerView.Adapter<TripData.MyViewHolder> {
         }else holder.trip_name.setText(trip.getOrigin() + " - " + trip.getDestination());
 
         holder.trip_date.setText(trip.getDate());
-        holder.trip_expense.setText("$"+String.valueOf(trip.getAmount()));
-        holder.trip_members.setText("0");
+        
+        String s = "$"+String.valueOf(trip.getAmount());
+        holder.trip_expense.setText(s);
+        holder.trip_members.setText(String.valueOf(trip.getMembers().size()));
 
         holder.trip_bg.setOnClickListener(new View.OnClickListener() {
             @Override
