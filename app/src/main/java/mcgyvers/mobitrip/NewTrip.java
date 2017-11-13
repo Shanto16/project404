@@ -1,6 +1,8 @@
 package mcgyvers.mobitrip;
 
 import android.app.DatePickerDialog;
+import android.app.FragmentManager;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -33,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import io.blackbox_vision.datetimepickeredittext.internal.fragment.DatePickerFragment;
 import io.blackbox_vision.datetimepickeredittext.view.DatePickerEditText;
 import mcgyvers.mobitrip.dataModels.AtPlace;
 import mcgyvers.mobitrip.dataModels.Member;
@@ -47,8 +51,10 @@ public class NewTrip extends Fragment {
 
     //SimpleDateFormat date;
     Button members,start;
-    MaterialEditText from,destination,amount,commonexpense;
+    MaterialEditText from,destination,amount,commonexpense,tripName,departureTime;
 
+    static final int DIALOG_ID = 0;
+    int hour,minute;
 
     DatePickerEditText trip_date;
     //Integer personalAmount;
@@ -74,6 +80,8 @@ public class NewTrip extends Fragment {
         destination = rootView.findViewById(R.id.destination);
         amount = rootView.findViewById(R.id.amount_per);
         commonexpense = rootView.findViewById(R.id.common_expense);
+        tripName = rootView.findViewById(R.id.trip_name);
+        departureTime = rootView.findViewById(R.id.et_trip_time);
 
 
         from.setFocusable(false);
@@ -81,6 +89,9 @@ public class NewTrip extends Fragment {
 
         destination.setFocusable(false);
         destination.setKeyListener(null);
+
+        departureTime.setFocusable(false);
+        departureTime.setKeyListener(null);
 
 
 
@@ -101,7 +112,14 @@ public class NewTrip extends Fragment {
 
         }
 
-
+        departureTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager fm = getActivity().getFragmentManager();
+                TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(),timeSet,hour,minute,true);
+                timePickerDialog.show();
+            }
+        });
 
 
         from.setOnClickListener(new View.OnClickListener() {
@@ -190,8 +208,18 @@ public class NewTrip extends Fragment {
 
     }
 
+    protected TimePickerDialog.OnTimeSetListener timeSet  = new TimePickerDialog.OnTimeSetListener() {
+        @Override
+        public void onTimeSet(TimePicker timePicker, int hour_x, int minute_x) {
+          hour = hour_x;
+          minute = minute_x;
 
-
+          if(hour<=12)
+          departureTime.setText(hour+":"+minute + " AM");
+          else
+              departureTime.setText(hour-12 + ":" +minute + " PM");
+        }
+    };
 
 
     void createTrip(String date, String origin, String destination_s, Integer amount_s, Integer common_s, ArrayList<Member> members){

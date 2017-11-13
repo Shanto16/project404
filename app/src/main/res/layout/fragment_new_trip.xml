@@ -28,6 +28,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/trip_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelText="Trip title"
+                    android:hint="Trip title"
+                    android:ems="15"
+                    app:met_iconLeft="@drawable/ic_start_point"
+                    app:met_iconPadding="0dp"
+                    app:met_minCharacters="2"
+                    />
+
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/from_journey"
                     android:layout_width="wrap_content"
@@ -98,6 +112,20 @@
             android:layout_marginBottom="8dp"
             android:backgroundTint="@color/colorAccent"
             android:hint="Select Date"/>
+
+
+        <com.rengwuxian.materialedittext.MaterialEditText
+            android:id="@+id/et_trip_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:met_floatingLabel="highlight"
+            app:met_floatingLabelText="Departure time"
+            android:hint="Departure time"
+            android:ems="15"
+            app:met_iconLeft="@drawable/ic_start_point"
+            app:met_iconPadding="0dp"
+            app:met_minCharacters="2"
+            />
 
 
 

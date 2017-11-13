@@ -243,7 +243,10 @@ public class Current_trip extends Fragment {
                 dialog.setTitle("My Expense");
 
 
+                ListView myExpenseList = dialog.findViewById(R.id.my_expense_listView);
+                TextView myTotal = dialog.findViewById(R.id.totalAMOUNT);
                 Button save_button = dialog.findViewById(R.id.my_expense_save);
+
 
                 save_button.setOnClickListener(new View.OnClickListener() {
                     @Override
