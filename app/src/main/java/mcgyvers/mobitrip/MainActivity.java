@@ -64,7 +64,8 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.main_container, new Current_trip());
         fragmentTransaction.commit();
-        getSupportActionBar().setTitle("Current Trip");
+        tool_txt.setText("Current Trip");
+        getSupportActionBar().setTitle("");
 
         Bundle b = getIntent().getExtras();
         if(b != null){ // if we are coming back from choosing a location in placePicker, open NewTrip and send bundle b with location params as argument

@@ -73,7 +73,6 @@ public class Current_trip extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_current_trip, container, false);
         final Context context = getActivity();
         mToolbar = rootView.findViewById(R.id.toolbar);
-
         getActivity().supportInvalidateOptionsMenu();
 
 

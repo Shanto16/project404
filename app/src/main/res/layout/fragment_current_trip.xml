@@ -5,7 +5,7 @@
 
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#ececec">
+    android:background="@color/background">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -147,59 +147,73 @@
                 <Button
                     android:id="@+id/cam_current"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:layout_margin="4dp"
-                    android:background="@drawable/btn_navigation"
-                    android:drawableLeft="@drawable/btn_camera"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/foreground_camera"
+                    android:drawableTop="@drawable/btn_camera"
                     android:paddingEnd="16dp"
+                    android:gravity="center"
                     android:paddingStart="16dp"
+                    android:paddingTop="20dp"
+                    android:drawablePadding="-50dp"
                     android:text="Camera" />
 
                 <Button
                     android:id="@+id/nav_restaurants"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="4dp"
-                    android:background="@drawable/restaurant_button"
-                    android:drawableLeft="@drawable/ic_restaurants"
+                    android:background="@drawable/foreground_restaurants"
+                    android:drawableTop="@drawable/ic_restaurants"
                     android:paddingEnd="16dp"
+                    android:gravity="center"
                     android:paddingStart="16dp"
+                    android:paddingTop="20dp"
+                    android:drawablePadding="-50dp"
                     android:text="Restaurants" />
 
                 <Button
                     android:id="@+id/nav_fuel"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="4dp"
-                    android:background="@drawable/gas_button"
-                    android:drawableLeft="@drawable/ic_gas_pumps"
+                    android:background="@drawable/forground_gas"
                     android:paddingEnd="16dp"
+                    android:drawableTop="@drawable/ic_gas_pumps"
+                    android:gravity="center"
                     android:paddingStart="16dp"
+                    android:paddingTop="20dp"
+                    android:drawablePadding="-50dp"
                     android:text="Fuel Stations" />
 
                 <Button
                     android:id="@+id/nav_police"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="4dp"
-                    android:background="@drawable/btn_police"
-                    android:drawableLeft="@drawable/ic_police_station"
+                    android:background="@drawable/forground_police"
+                    android:drawableTop="@drawable/ic_police_station"
                     android:paddingEnd="16dp"
+                    android:gravity="center"
                     android:paddingStart="16dp"
+                    android:paddingTop="20dp"
+                    android:drawablePadding="-50dp"
                     android:text="Police Station" />
 
 
                 <Button
                     android:id="@+id/my_expense_button"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="4dp"
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="32dp"
-                    android:background="@drawable/btn_my_expense"
-                    android:drawableLeft="@drawable/ic_my_expense"
+                    android:background="@drawable/forground_my_expense"
+                    android:drawableTop="@drawable/ic_my_expense"
                     android:paddingEnd="16dp"
+                    android:gravity="center"
                     android:paddingStart="16dp"
+                    android:paddingTop="20dp"
+                    android:drawablePadding="-50dp"
                     android:text="My Expense"
 
                     />
@@ -216,60 +230,74 @@
                 <Button
                     android:id="@+id/nav_hospitals"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:layout_margin="4dp"
-                    android:background="@drawable/hospital_button"
-                    android:drawableLeft="@drawable/ic_hospitals"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/foreground_hospital"
+                    android:drawableTop="@drawable/ic_hospitals"
                     android:paddingEnd="16dp"
+                    android:gravity="center"
                     android:paddingStart="16dp"
+                    android:paddingTop="20dp"
+                    android:drawablePadding="-50dp"
                     android:text="Hospitals" />
 
                 <Button
                     android:id="@+id/nav_hotels"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="4dp"
-                    android:background="@drawable/hotel_button"
-                    android:drawableLeft="@drawable/ic_local_hotels"
+                    android:background="@drawable/forground_hotels"
                     android:paddingEnd="16dp"
+                    android:gravity="center"
+                    android:drawableTop="@drawable/ic_local_hotels"
                     android:paddingStart="16dp"
+                    android:paddingTop="20dp"
+                    android:drawablePadding="-50dp"
                     android:text="Hotels" />
 
 
                 <Button
                     android:id="@+id/nav_spots"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="4dp"
-                    android:background="@drawable/tourists_button"
-                    android:drawableLeft="@drawable/ic_tourist_spots"
+                    android:background="@drawable/forground_tourists"
+                    android:drawableTop="@drawable/ic_tourist_spots"
                     android:paddingEnd="16dp"
+                    android:gravity="center"
                     android:paddingStart="16dp"
+                    android:paddingTop="20dp"
+                    android:drawablePadding="-50dp"
                     android:text="Tourist Spots" />
 
                 <Button
                     android:id="@+id/nav_maps"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="wrap_content"
                     android:layout_margin="4dp"
-                    android:background="@drawable/maps_button"
-                    android:drawableLeft="@drawable/ic_maps"
+                    android:background="@drawable/forground_maps"
+                    android:drawableTop="@drawable/ic_maps"
                     android:paddingEnd="16dp"
+                    android:gravity="center"
                     android:paddingStart="16dp"
+                    android:paddingTop="20dp"
+                    android:drawablePadding="-50dp"
                     android:text="Maps" />
 
 
                 <Button
                     android:id="@+id/team_expense_button"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="4dp"
                     android:layout_marginStart="4dp"
                     android:layout_marginTop="32dp"
-                    android:background="@drawable/btn_my_expense"
-                    android:drawableLeft="@drawable/ic_attach_money_black_24dp"
+                    android:background="@drawable/forground_team_expense"
+                    android:drawableTop="@drawable/ic_team_expense"
                     android:paddingEnd="16dp"
+                    android:gravity="center"
                     android:paddingStart="16dp"
+                    android:paddingTop="20dp"
+                    android:drawablePadding="-50dp"
                     android:text="Team Expense" />
 
 
@@ -285,7 +313,6 @@
             android:layout_marginTop="30dp"
             android:background="@drawable/btn_dismiss"
             android:drawableLeft="@drawable/ic_dismiss_trip"
-            android:foreground="?attr/selectableItemBackground"
             android:paddingEnd="30dp"
             android:paddingStart="30dp"
             android:text="Dismiss" />
@@ -299,7 +326,6 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/btn_finish_trip"
             android:drawableLeft="@drawable/ic_end_trip"
-            android:foreground="?attr/selectableItemBackground"
             android:paddingEnd="30dp"
             android:paddingStart="30dp"
             android:text="End Trip" />

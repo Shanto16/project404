@@ -40,7 +40,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="mcgyvers.mobitrip.MainActivity" />
         </activity>
-        <activity android:name=".CompletedTrip" />
+        <activity android:name=".CompletedTrip"
+            android:theme="@style/AppThemeNoActionBar"/>
         <activity android:name=".Fullscreen_single" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

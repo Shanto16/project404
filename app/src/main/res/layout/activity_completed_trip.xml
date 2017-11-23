@@ -1,209 +1,312 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+    <include layout="@layout/toolbar_layout" />
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="mcgyvers.mobitrip.CompletedTrip"
-        android:layout_margin="16dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-
-        <TextView
-            android:id="@+id/origin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="From:"
-            android:textSize="16sp"/>
-
-        <TextView
-            android:id="@+id/originTXT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="London"
-            android:layout_below="@+id/origin"
-            android:textSize="32sp"/>
-
-        <TextView
-            android:id="@+id/destination_"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="To:"
-            android:layout_below="@+id/originTXT"
-            android:layout_marginTop="16dp"
-            android:textSize="16sp"/>
-
-        <TextView
-            android:id="@+id/destination_TXT"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Brazil"
-            android:layout_below="@+id/destination_"
-            android:textSize="32sp"/>
-
-
-        <RelativeLayout
-            android:layout_marginTop="32sp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-
-            <ImageView
-                android:id="@+id/date_IV"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_trip_date"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentStart="true"
-                 />
-
-            <TextView
-                android:id="@+id/dateTXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/date_IV"
-                android:layout_toRightOf="@+id/date_IV"
-                android:text="Date:"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="16dp"
-                />
-
-            <TextView
-                android:id="@+id/show_trip_date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/date_IV"
-                android:layout_toRightOf="@+id/dateTXT"
-                android:text="23/5/2017"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="8dp"
-               />
-
-            <ImageView
-                android:id="@+id/total_member"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/date_IV"
-                android:layout_below="@+id/date_IV"
-                android:src="@drawable/ic_members" />
-
-
-            <TextView
-                android:id="@+id/total_membersTXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/total_member"
-                android:text="Team size:"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="16dp"
-                android:layout_toRightOf="@+id/total_member"
-                />
-
-
-            <TextView
-                android:id="@+id/show_trip_total_member"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/total_member"
-                android:text="7"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="8dp"
-                android:layout_toRightOf="@+id/total_membersTXT"
-                />
-
-            <ImageView
-                android:id="@+id/total_EXP"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/total_member"
-                android:layout_below="@+id/total_member"
-                android:src="@drawable/ic_team_expense" />
-
-
-            <TextView
-                android:id="@+id/total_expenseTXT"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/total_EXP"
-                android:text="Total expense:"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="16dp"
-                android:layout_toRightOf="@+id/total_EXP"
-                />
-
-            <TextView
-                android:id="@+id/show_trip_total_expense"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/total_EXP"
-                android:text="7000"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="8dp"
-                android:layout_toRightOf="@+id/total_expenseTXT"
-                />
-
-
-            <ImageView
-                android:id="@+id/per_exp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignStart="@+id/total_member"
-                android:layout_below="@+id/total_EXP"
-                android:src="@drawable/ic_my_expense" />
-
-
-            <TextView
-                android:id="@+id/avg_expense"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/per_exp"
-                android:text="Avg. per expense:"
-                android:layout_marginTop="4dp"
-                android:layout_marginStart="16dp"
-                android:layout_toRightOf="@+id/per_exp"
-                />
-
-            <TextView
-                android:id="@+id/show_avg_expense"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignTop="@+id/avg_expense"
-                android:text="7000"
-                android:layout_marginStart="8dp"
-                android:layout_toRightOf="@+id/avg_expense"
-                />
-        </RelativeLayout>
-
-
-        <Button
-            android:id="@+id/membersDetails"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="  Members"
-            android:layout_gravity="center_horizontal"
-            android:drawableLeft="@drawable/ic_members"
-            android:paddingStart="40dp"
-            android:paddingEnd="40dp"
-            android:background="@drawable/hospital_button"/>
-
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/trip_pictures"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:numColumns="3"
-            android:layout_marginBottom="4dp"
-            android:stretchMode="columnWidth" />
+            android:orientation="vertical">
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="8dp">
 
 
-    </LinearLayout>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/det_tour_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginBottom="30dp"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center_horizontal"
+                        android:text="Journey to the sea"
+                        android:textColor="@color/font_title"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/det_tour_route"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/det_tour_name"
+                        android:layout_marginStart="8dp"
+                        android:textAllCaps="false"
+                        android:textColor="@color/font_normal"
+                        android:text="from DHAKA to COX'S BAZAAR"
+                        android:textSize="11sp" />
 
 
+                    <TextView
+                        android:id="@+id/det_tour_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignTop="@+id/det_tour_route"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="16dp"
+                        android:text="Date : 13/11/2017 - 17/11/2017"
+                        android:textColor="@color/font_normal"
+                        android:textSize="11sp" />
 
-</android.support.v4.widget.NestedScrollView>
+
+                    <TextView
+                        android:id="@+id/det_tour_avg"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/det_tour_route"
+                        android:layout_marginStart="8dp"
+                        android:text="Avg. Expense : 5500/-"
+                        android:textColor="@color/font_normal"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/det_tour_common"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/det_tour_avg"
+                        android:layout_marginStart="8dp"
+                        android:text="Common Expense : 2000/-"
+                        android:textColor="@color/font_normal"
+                        android:textSize="11sp" />
+
+                    <TextView
+                        android:id="@+id/det_tour_member"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/det_tour_common"
+                        android:layout_marginStart="8dp"
+                        android:text="Team size : 5"
+                        android:textColor="@color/font_normal"
+                        android:layout_marginBottom="8dp"
+
+                        android:textSize="11sp" />
+
+
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="10dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/det_expenseTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginBottom="30dp"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center_horizontal"
+                        android:text="Expenses"
+                        android:textColor="@color/font_title"
+                        android:textSize="16sp" />
+
+                    <ListView
+                        android:id="@+id/det_member_expense_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginStart="8dp"/>
+
+
+                    <Button
+                        android:id="@+id/det_more_expense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="10dp"
+                        android:background="@drawable/btn_more_expense"
+                        android:text="more"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorPrimary" />
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="10dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="160dp"
+                        android:scaleType="fitXY"
+                        android:layout_marginBottom="4dp"
+                        android:src="@drawable/map_mock"
+                        />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+
+                        <ImageView
+                            android:layout_width="11dp"
+                            android:layout_height="15dp"
+                            android:src="@drawable/start_point"
+                            android:layout_marginStart="8dp"
+                            android:scaleType="fitXY"
+                            android:layout_gravity="center_vertical"
+
+                            />
+
+                        <TextView
+                            android:id="@+id/from_map"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="from DHAKA"
+                            android:textSize="11sp"
+                            android:textAllCaps="false"
+                            android:layout_marginStart="4dp"
+                            android:textColor="@color/font_normal"
+                            android:layout_gravity="center_vertical"/>
+
+                        <View
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"/>
+
+                        <ImageView
+                            android:layout_width="11dp"
+                            android:layout_height="15dp"
+                            android:src="@drawable/end_point"
+                            android:layout_marginStart="8dp"
+                            android:scaleType="fitXY"
+                            android:layout_gravity="center_vertical"
+
+                            />
+
+                        <TextView
+                            android:id="@+id/to_map"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="to COX'S Bazaar"
+                            android:textSize="11sp"
+                            android:textAllCaps="false"
+                            android:textColor="@color/font_normal"
+                            android:layout_marginStart="4dp"
+                            android:layout_gravity="center_vertical"/>
+
+                        <View
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"/>
+
+
+                        <TextView
+                            android:id="@+id/distance_map"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Distance: 320km"
+                            android:textSize="11sp"
+                            android:textAllCaps="false"
+                            android:layout_marginStart="4dp"
+                            android:textColor="@color/font_normal"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginEnd="8dp"/>
+
+                    </LinearLayout>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+
+            <android.support.v7.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="10dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/det_pictures_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Pictures"
+                        android:gravity="center"
+                        android:layout_marginTop="16dp"
+                        android:textSize="16sp"
+                        android:textColor="@color/font_title"
+                        android:layout_marginBottom="16dp"/>
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/det_pictures_recyclerview"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_gravity="center"
+                        android:numColumns="3"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp"
+                        android:layout_marginBottom="4dp"
+                        android:stretchMode="columnWidth" />
+
+
+                    <Button
+                        android:id="@+id/det_show_all_pictures"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="10dp"
+                        android:background="@drawable/btn_more_expense"
+                        android:text="see all"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorPrimary" />
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

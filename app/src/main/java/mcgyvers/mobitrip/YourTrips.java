@@ -38,7 +38,7 @@ public class YourTrips extends Fragment {
     //****FOR MODEL****
     ImageView trip_bg;
     TextView trip_name;
-    TextView trip_date;
+    TextView trip_dateStart,trip_dateEnd;
     TextView trip_members;
     TextView trip_expense;
     TextView date_txt,avg_txt;
@@ -58,12 +58,12 @@ public class YourTrips extends Fragment {
         my_trips = rootView.findViewById(R.id.my_trips_recyclerView);
 
         trip_bg = rootView.findViewById(R.id.bg_trip);
-        trip_date = rootView.findViewById(R.id.tour_date);
-        trip_name = rootView.findViewById(R.id.tour_name);
-        trip_members = rootView.findViewById(R.id.trip_total_member);
-        trip_expense = rootView.findViewById(R.id.trip_expense_per_head);
-        date_txt = rootView.findViewById(R.id.tour_date_txt);
-        avg_txt = rootView.findViewById(R.id.ic_expense_per_head);
+        trip_dateStart = rootView.findViewById(R.id.tour_date_start);
+        trip_dateEnd = rootView.findViewById(R.id.tour_date_end);
+        trip_name = rootView.findViewById(R.id.tour_route);
+        trip_members = rootView.findViewById(R.id.tour_team_size);
+        trip_expense = rootView.findViewById(R.id.tour_avg_expense);
+        date_txt = rootView.findViewById(R.id.tour_date_text);
 
 
         mAdaper = new TripData(tripList, getContext());

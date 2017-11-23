@@ -57,14 +57,14 @@ public class TripData extends RecyclerView.Adapter<TripData.MyViewHolder> {
         System.out.println(trip.getOrigin());
 
         if(trip.getOriginPlace() != null){
-            holder.trip_name.setText(trip.getOriginPlace().getName() + " - " + trip.getDestPlace().getName());
-        }else holder.trip_name.setText(trip.getOrigin() + " - " + trip.getDestination());
+            holder.trip_route.setText("From "+trip.getOriginPlace().getName().toUpperCase() + " to " + trip.getDestPlace().getName().toUpperCase());
+        }else holder.trip_route.setText(trip.getOrigin() + " - " + trip.getDestination());
 
-        holder.trip_date.setText(trip.getDate());
+        holder.trip_dateStart.setText(trip.getDate());
         
-        String s = "$"+String.valueOf(trip.getAmount());
+        String s = "Avg. expense per person: $"+String.valueOf(trip.getAmount());
         holder.trip_expense.setText(s);
-        holder.trip_members.setText(String.valueOf(trip.getMembers().size()));
+        holder.trip_members.setText("Team size: "+String.valueOf(trip.getMembers().size()));
 
         holder.trip_bg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,13 +88,13 @@ public class TripData extends RecyclerView.Adapter<TripData.MyViewHolder> {
     }
 
     public class MyViewHolder extends  RecyclerView.ViewHolder {
-        public ImageView trip_bg;
-        public TextView trip_name;
-        public TextView trip_date;
-        public TextView trip_members;
-        public TextView trip_expense;
-        public TextView date_txt;
-        public TextView avg_txt;
+        ImageView trip_bg;
+        TextView trip_route;
+        TextView trip_dateStart,trip_dateEnd;
+        TextView trip_members;
+        TextView trip_expense;
+        TextView date_txt;
+        TextView tour_name;
 
 
         public MyViewHolder(View view) {
@@ -102,20 +102,23 @@ public class TripData extends RecyclerView.Adapter<TripData.MyViewHolder> {
 
             System.out.println("creating objects");
             trip_bg = view.findViewById(R.id.bg_trip);
-            trip_date = view.findViewById(R.id.tour_date);
-            trip_name = view.findViewById(R.id.tour_name);
-            trip_members = view.findViewById(R.id.trip_total_member);
-            trip_expense = view.findViewById(R.id.trip_expense_per_head);
-            date_txt = view.findViewById(R.id.tour_date_txt);
-            avg_txt = view.findViewById(R.id.ic_expense_per_head);
+            trip_dateStart = view.findViewById(R.id.tour_date_start);
+            trip_dateEnd = view.findViewById(R.id.tour_date_end);
+            trip_route = view.findViewById(R.id.tour_route);
+            trip_members = view.findViewById(R.id.tour_team_size);
+            trip_expense = view.findViewById(R.id.tour_avg_expense);
+            date_txt = view.findViewById(R.id.tour_date_text);
+            tour_name = view.findViewById(R.id.tour_name);
 
             Typeface regular = Typeface.createFromAsset(itemView.getContext().getAssets(),"fonts/Regular.ttf");
-            trip_date.setTypeface(regular);
-            trip_name.setTypeface(regular);
-            trip_members.setTypeface(regular);
-            trip_expense.setTypeface(regular);
-            date_txt.setTypeface(regular);
-            avg_txt.setTypeface(regular);
+            Typeface firaSans_medium = Typeface.createFromAsset(itemView.getContext().getAssets(),"fonts/FiraSans-Medium.ttf");
+            Typeface firaSans_semiBold = Typeface.createFromAsset(itemView.getContext().getAssets(),"fonts/FiraSans-Medium.ttf");
+
+            trip_route.setTypeface(firaSans_medium);
+            trip_members.setTypeface(firaSans_medium);
+            trip_expense.setTypeface(firaSans_medium);
+            date_txt.setTypeface(firaSans_medium);
+            tour_name.setTypeface(firaSans_semiBold);
 
 
 
