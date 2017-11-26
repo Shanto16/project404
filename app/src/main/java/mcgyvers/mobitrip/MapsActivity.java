@@ -248,7 +248,7 @@ public class MapsActivity extends AppCompatActivity implements OpenStreetMapCons
         }
 
 
-        currentTrip = Current_trip.getCurrentTrip(getApplicationContext(), getString(R.string.preference_file_key), getString(R.string.trips_array));
+        currentTrip = Current_trip.getCurrentTrip(getApplicationContext());
         if(currentTrip != null && currentTrip.getOriginPlace()!= null){
             Location origin = new Location("");
             Location destination = new Location("");

@@ -2,6 +2,7 @@ package mcgyvers.mobitrip;
 
 import android.*;
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
@@ -17,13 +18,17 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -36,12 +41,16 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.timqi.sectorprogressview.ColorfulRingProgressView;
 
+import org.apache.commons.lang3.ObjectUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import mcgyvers.mobitrip.dataModels.Expense;
 import mcgyvers.mobitrip.dataModels.Trip;
 
+import static mcgyvers.mobitrip.R.id.all;
 import static mcgyvers.mobitrip.R.id.place_autocomplete_prediction_primary_text;
 import static mcgyvers.mobitrip.R.id.toolbar;
 
@@ -61,6 +70,7 @@ public class Current_trip extends Fragment {
     Toolbar mToolbar;
 
     Trip currentTrip = null;
+    int currentPos = 0;
 
     private static final int MY_PERMISSION_REQUEST_LOCATION=1;
 
@@ -242,14 +252,34 @@ public class Current_trip extends Fragment {
                 dialog.setTitle("My Expense");
 
 
+
                 ListView myExpenseList = dialog.findViewById(R.id.my_expense_listView);
                 TextView myTotal = dialog.findViewById(R.id.totalAMOUNT);
                 Button save_button = dialog.findViewById(R.id.my_expense_save);
+
+                final ArrayList<Expense> expenses = new ArrayList<>();
+                final ExpensesAdapter expensesAdapter = new ExpensesAdapter(expenses);
+                myExpenseList.setAdapter(expensesAdapter);
+                myTotal.setText(String.valueOf(expensesAdapter.totalExp()));
+
+                if(currentTrip.getExpenses() != null){
+                    expenses.addAll(currentTrip.getExpenses());
+                }
+
 
 
                 save_button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        currentPos = getCurrentPos(getContext());
+                        if(currentPos > -1){
+                            expensesAdapter.notifyDataSetChanged();
+                            currentTrip.setExpenses(expenses);
+                            UpdateTripList(getContext(),currentTrip, currentPos);
+                        }else{
+                            Toast.makeText(getContext(), "Error adding expenses", Toast.LENGTH_LONG).show();
+                        }
+
                         dialog.dismiss();
                     }
                 });
@@ -259,7 +289,11 @@ public class Current_trip extends Fragment {
                 addExpense.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Toast.makeText(getActivity(), "A new 'my_expense_model.xml' will be added in this listView here. ", Toast.LENGTH_LONG).show();
+                        Expense expense = new Expense("", "");
+
+                        expenses.add(expense);
+                        expensesAdapter.notifyDataSetChanged();
+
                     }
                 });
 
@@ -307,30 +341,84 @@ public class Current_trip extends Fragment {
         });
 
 
-        currentTrip = getCurrentTrip(getContext(), getString(R.string.preference_file_key), getString(R.string.trips_array));
+        currentTrip = getCurrentTrip(getContext());
 
 
         return rootView;
     }
 
     /**
-     * Method for returning a trip object containing the latest created trip.
-     * It fetches the array list of all the trips on the device, and returns only
-     * the first element on the list, if it exists
-     * @return Trip object
+     * method for returning the ArrayList of trip objects containing all of the
+     * trips already added by the user from the local storage
+     * mainly for use in other functions.
+     * @param context current activity context
+     * @return Array list of trip objects
      */
-    public static Trip getCurrentTrip(Context context, String prefs, String tripsArray) {
+    public static ArrayList<Trip> getTripList(Context context){
 
-        SharedPreferences sharedPreferences = context.getSharedPreferences(prefs, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         Gson gson = new Gson();
-        String tripArray = sharedPreferences.getString(tripsArray, "[]");
+        String tripArray = sharedPreferences.getString(context.getString(R.string.trips_array), "[]");
+
         ArrayList<Trip> allTrips = gson.fromJson(tripArray, new TypeToken<ArrayList<Trip>>(){}.getType());
         if(allTrips.size() > 0){
+            return allTrips;
+        } else return null;
+
+    }
+
+    /**
+     * Method for returning a trip object containing the latest created trip.
+     * It fetches the array list of all the trips on the device, and returns only
+     * the first element on the list, if it exists. It also updates currentPos int
+     * variable with the position of the current trip in the list
+     *
+     * @param context current activity context
+     * @return Trip object
+     */
+    public static Trip getCurrentTrip(Context context) {
+
+        ArrayList<Trip> allTrips = getTripList(context);
+
+        if(allTrips != null){
+
             return allTrips.get(allTrips.size() - 1);
         } else return null;
 
 
 
+    }
+
+    /**
+     * Method for updating the list of trips, will be used when expenses are added on the
+     * list of members.
+     *
+     * @param context current activity context
+     * @param trip object to be modified in the list
+     * @param pos position of the object in the list
+     */
+    public static void UpdateTripList(Context context, Trip trip, int pos){
+
+
+        ArrayList<Trip> allTrips = getTripList(context);
+        allTrips.set(pos, trip);
+
+        String tripsArray = new Gson().toJson(allTrips);
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(context.getString(R.string.trips_array), tripsArray);
+        editor.apply();
+        System.out.println(tripsArray);
+
+
+    }
+
+    public int getCurrentPos(Context context){
+        ArrayList e = getTripList(context);
+        if(e != null)
+            return e.size() - 1;
+        return -1;
     }
 
 
@@ -396,5 +484,127 @@ public class Current_trip extends Fragment {
             e.printStackTrace();
         }
         return myCity;
+    }
+
+
+    private static class ViewHolder {
+        private EditText exp;
+        private EditText cost;
+        private TextWatcher costTextWatcher, expTextWatcher;
+    }
+
+
+    public class ExpensesAdapter extends BaseAdapter{
+
+        private ArrayList<Expense> expenses;
+
+        public ExpensesAdapter(ArrayList<Expense> expenses){
+            this.expenses = expenses;
+        }
+
+        @Override
+        public int getCount() {
+            return expenses.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return expenses.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        public int totalExp(){
+            int exps = 0;
+
+            for(int i = 0; i < expenses.size(); i++){
+                Integer thisExps = Integer.valueOf(expenses.get(i).getCost());
+                exps += thisExps;
+            }
+            System.out.println(String.valueOf(exps));
+
+            return exps;
+
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+
+            View view = convertView;
+            if(view == null){
+                // not recycled, inflate a new view
+
+                view = getLayoutInflater().inflate(R.layout.my_expense_model, null);
+                ViewHolder viewHolder = new ViewHolder();
+                viewHolder.exp = view.findViewById(R.id.usedON);
+                viewHolder.cost = view.findViewById(R.id.cost);
+                view.setTag(viewHolder);
+
+
+
+            }
+
+            ViewHolder holder = (ViewHolder) view.getTag();
+            // Remove any existing TextWatcher that will be keyed to the wrong ListItem
+            if(holder.costTextWatcher != null)
+                holder.cost.removeTextChangedListener(holder.costTextWatcher);
+
+            if(holder.expTextWatcher != null)
+                holder.exp.removeTextChangedListener(holder.expTextWatcher);
+
+
+
+            final Expense expense = expenses.get(position);
+            // Keep a reference to the TextWatcher so that we can remove it later
+            holder.costTextWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    expense.setCost(s.toString());
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            };
+
+            holder.expTextWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    expense.setName(s.toString());
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            };
+
+            holder.exp.addTextChangedListener(holder.expTextWatcher);
+            holder.exp.setText(expense.getName());
+            holder.cost.addTextChangedListener(holder.costTextWatcher);
+            holder.cost.setText(expense.getCost());
+
+
+
+
+            return view;
+
+        }
     }
 }

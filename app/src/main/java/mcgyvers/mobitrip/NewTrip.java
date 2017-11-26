@@ -39,6 +39,7 @@ import java.util.Locale;
 import io.blackbox_vision.datetimepickeredittext.internal.fragment.DatePickerFragment;
 import io.blackbox_vision.datetimepickeredittext.view.DatePickerEditText;
 import mcgyvers.mobitrip.dataModels.AtPlace;
+import mcgyvers.mobitrip.dataModels.Expense;
 import mcgyvers.mobitrip.dataModels.Member;
 import mcgyvers.mobitrip.dataModels.Trip;
 
@@ -235,7 +236,8 @@ public class NewTrip extends Fragment {
         long tripId = date1.getTime();
         //getting the number of trips currently in store in order to creat an id for the new trip
         long tripsN = sharedPreferences.getLong(getString(R.string.trip_count), 0);
-        Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(tripId));
+
+        Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(tripId), null);
 
         //getting the list of members currently on the temporary trip file
         ArrayList<Member> m = Current_trip_member_information.getMembers(getContext());
@@ -272,6 +274,7 @@ public class NewTrip extends Fragment {
             //creates json object with the new trip and puts it into the array of trips
             JSONObject newTrip =  new JSONObject(gson.toJson(trip));
             trips.put(newTrip);
+
 
             //add everything to storage and save
             editor.putString(getString(R.string.trips_array), trips.toString());

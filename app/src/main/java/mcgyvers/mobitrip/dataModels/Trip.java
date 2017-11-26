@@ -25,9 +25,11 @@ public class Trip {
 
     private ArrayList<Member> members;
 
+    private ArrayList<Expense> expenses;
+
     public Trip(){}
 
-    public Trip(String origin, String destination, Integer amount, Integer commonExp, ArrayList<Member> Members, String date, String tripId){
+    public Trip(String origin, String destination, Integer amount, Integer commonExp, ArrayList<Member> Members, String date, String tripId, ArrayList<Expense> expenses){
         //programatically generate tripId
         this.origin = origin;
         this.destination = destination;
@@ -38,6 +40,7 @@ public class Trip {
         this.setCompleted(false);
         this.members = new ArrayList<>();
         this.tripId = tripId; //later on generate them upon checking the local storage
+        this.expenses = expenses;
     }
 
     public void setDestPlace(AtPlace destPlace){ this.destPlace = destPlace;}
@@ -117,5 +120,13 @@ public class Trip {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+
+    public ArrayList<Expense> getExpenses() {
+        return expenses;
+    }
+
+    public void setExpenses(ArrayList<Expense> expenses) {
+        this.expenses = expenses;
     }
 }
