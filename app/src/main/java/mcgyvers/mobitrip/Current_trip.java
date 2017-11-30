@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import mcgyvers.mobitrip.adapters.MemberData;
 import mcgyvers.mobitrip.dataModels.Expense;
 import mcgyvers.mobitrip.dataModels.Trip;
 
@@ -61,7 +62,7 @@ import static mcgyvers.mobitrip.R.id.toolbar;
  * Class for displaying data about the latest trip
  */
 
-public class Current_trip extends Fragment {
+public class Current_trip extends Fragment implements MemberData.onItemClickListener{
 
     float max = 5000, min = 1200;
 
@@ -74,6 +75,11 @@ public class Current_trip extends Fragment {
     Trip currentTrip = null;
     int currentPos = 0;
     int totalmExpenses = 0;
+
+
+    // adapter for handling expenses
+    final ArrayList<Expense> expenses = new ArrayList<>();
+    final ExpensesAdapter expensesAdapter = new ExpensesAdapter(expenses, this);
 
     private static final int MY_PERMISSION_REQUEST_LOCATION=1;
 
@@ -140,6 +146,8 @@ public class Current_trip extends Fragment {
                 Toast.makeText(getActivity(), "Location not found", Toast.LENGTH_SHORT).show();
             }
         }
+
+
 
 
         hospitals.setTransformationMethod(null);
@@ -268,10 +276,14 @@ public class Current_trip extends Fragment {
 
 
 
-
-                final ArrayList<Expense> expenses = new ArrayList<>();
-                final ExpensesAdapter expensesAdapter = new ExpensesAdapter(expenses);
                 myExpenseList.setAdapter(expensesAdapter);
+                expensesAdapter.notifyDataSetChanged();
+
+
+
+
+
+
 
                 if(currentTrip.getExpenses() != null){
                     expenses.addAll(currentTrip.getExpenses());
@@ -451,6 +463,17 @@ public class Current_trip extends Fragment {
         return -1;
     }
 
+    @Override
+    public void callback(int pos) {
+        //currentTrip.getExpenses().remove(pos);
+        expenses.remove(pos);
+        expensesAdapter.notifyDataSetChanged();
+
+    }
+
+
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults){
@@ -517,19 +540,25 @@ public class Current_trip extends Fragment {
     }
 
 
+
     private static class ViewHolder {
         private EditText exp;
         private EditText cost;
         private TextWatcher costTextWatcher, expTextWatcher;
+        private ImageView remove;
     }
 
 
     public class ExpensesAdapter extends BaseAdapter{
 
         private ArrayList<Expense> expenses;
+        private final MemberData.onItemClickListener listener;
 
-        public ExpensesAdapter(ArrayList<Expense> expenses){
+
+
+        public ExpensesAdapter(ArrayList<Expense> expenses, MemberData.onItemClickListener listener){
             this.expenses = expenses;
+            this.listener = listener;
         }
 
         @Override
@@ -547,7 +576,6 @@ public class Current_trip extends Fragment {
             return 0;
         }
 
-        //TODO: this only returns zeroes, fix that
         public Integer totalExp(){
             Integer exps = 0;
 
@@ -565,7 +593,7 @@ public class Current_trip extends Fragment {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
 
 
             View view = convertView;
@@ -576,6 +604,7 @@ public class Current_trip extends Fragment {
                 ViewHolder viewHolder = new ViewHolder();
                 viewHolder.exp = view.findViewById(R.id.usedON);
                 viewHolder.cost = view.findViewById(R.id.cost);
+                viewHolder.remove = view.findViewById(R.id.remove_item_expense);
                 view.setTag(viewHolder);
 
 
@@ -589,6 +618,7 @@ public class Current_trip extends Fragment {
 
             if(holder.expTextWatcher != null)
                 holder.exp.removeTextChangedListener(holder.expTextWatcher);
+
 
 
 
@@ -628,6 +658,14 @@ public class Current_trip extends Fragment {
 
                 }
             };
+
+            holder.remove.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.callback(position);
+
+                }
+            });
 
             holder.exp.addTextChangedListener(holder.expTextWatcher);
             holder.exp.setText(expense.getName());

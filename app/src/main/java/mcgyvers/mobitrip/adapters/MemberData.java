@@ -89,7 +89,7 @@ public class MemberData extends RecyclerView.Adapter<MemberData.MyViewHolder> {
         }
     }
 
-    public interface onItemClickListener{
+    public static interface onItemClickListener{
 
         public void callback(int pos);
     }
