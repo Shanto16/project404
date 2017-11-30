@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="16dp">
+    android:background="@drawable/alert_dialog_bg"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_margin="4dp">
 
 
         <ImageView
@@ -17,8 +18,8 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="30dp"
             android:src="@drawable/ic_add_new"
+            android:layout_marginBottom="30dp"
             android:elevation="8dp"/>
         
 
@@ -26,8 +27,8 @@
         <ListView
             android:id="@+id/my_expense_listView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16sp">
+            android:layout_height="350dp"
+            >
 
         </ListView>
 
@@ -73,5 +74,5 @@
 
 
 
-</android.support.v4.widget.NestedScrollView>
+</LinearLayout>
 

@@ -60,12 +60,12 @@
                         android:id="@+id/det_tour_date"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentEnd="true"
-                        android:layout_alignTop="@+id/det_tour_route"
                         android:layout_marginEnd="8dp"
-                        android:layout_marginStart="16dp"
+                        android:layout_marginStart="8dp"
                         android:text="Date : 13/11/2017 - 17/11/2017"
                         android:textColor="@color/font_normal"
+                        android:layout_below="@+id/det_tour_member"
+                        android:layout_marginBottom="8dp"
                         android:textSize="11sp" />
 
 
@@ -97,8 +97,6 @@
                         android:layout_marginStart="8dp"
                         android:text="Team size : 5"
                         android:textColor="@color/font_normal"
-                        android:layout_marginBottom="8dp"
-
                         android:textSize="11sp" />
 
 

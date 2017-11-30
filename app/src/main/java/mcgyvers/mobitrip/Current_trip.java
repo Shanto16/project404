@@ -8,7 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
@@ -249,6 +251,7 @@ public class Current_trip extends Fragment {
                 // custom dialog
                 final Dialog dialog = new Dialog(context);
                 dialog.setContentView(R.layout.my_expense_dialog);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.setTitle("My Expense");
 
 
@@ -264,6 +267,13 @@ public class Current_trip extends Fragment {
 
                 if(currentTrip.getExpenses() != null){
                     expenses.addAll(currentTrip.getExpenses());
+                }
+
+                if(expensesAdapter.getCount() > 5){
+                    View item = expensesAdapter.getView(0, null, myExpenseList);
+                    item.measure(0, 0);
+                    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (5.5 * item.getMeasuredHeight()));
+                    myExpenseList.setLayoutParams(params);
                 }
 
 
