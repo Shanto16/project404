@@ -73,6 +73,7 @@ public class Current_trip extends Fragment {
 
     Trip currentTrip = null;
     int currentPos = 0;
+    int totalmExpenses = 0;
 
     private static final int MY_PERMISSION_REQUEST_LOCATION=1;
 
@@ -256,14 +257,21 @@ public class Current_trip extends Fragment {
 
 
 
+
                 ListView myExpenseList = dialog.findViewById(R.id.my_expense_listView);
-                TextView myTotal = dialog.findViewById(R.id.totalAMOUNT);
                 Button save_button = dialog.findViewById(R.id.my_expense_save);
+
+                TextView mText = dialog.findViewById(R.id.totalTEXT);
+                final TextView mTotal = dialog.findViewById(R.id.totalAMOUNT);
+                mText.setText("Total: ");
+                mTotal.setText(String.valueOf(currentTrip.getCommonExp()));
+
+
+
 
                 final ArrayList<Expense> expenses = new ArrayList<>();
                 final ExpensesAdapter expensesAdapter = new ExpensesAdapter(expenses);
                 myExpenseList.setAdapter(expensesAdapter);
-                myTotal.setText(String.valueOf(expensesAdapter.totalExp()));
 
                 if(currentTrip.getExpenses() != null){
                     expenses.addAll(currentTrip.getExpenses());
@@ -283,6 +291,14 @@ public class Current_trip extends Fragment {
                     public void onClick(View view) {
                         currentPos = getCurrentPos(getContext());
                         if(currentPos > -1){
+
+                            // removing the blank objects
+                            for(int i = expenses.size()-1; i >= 0; i--){
+                                if(expenses.get(i).getName().equals("") || expenses.get(i).getCost().equals("")){
+                                    expenses.remove(i);
+                                }
+                            }
+
                             expensesAdapter.notifyDataSetChanged();
                             currentTrip.setExpenses(expenses);
                             UpdateTripList(getContext(),currentTrip, currentPos);
@@ -299,10 +315,14 @@ public class Current_trip extends Fragment {
                 addExpense.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
+
                         Expense expense = new Expense("", "");
 
-                        expenses.add(expense);
+                        expenses.add(0, expense);
                         expensesAdapter.notifyDataSetChanged();
+                        mTotal.setText(String.valueOf(totalmExpenses));
+
 
                     }
                 });
@@ -527,12 +547,16 @@ public class Current_trip extends Fragment {
             return 0;
         }
 
-        public int totalExp(){
-            int exps = 0;
+        //TODO: this only returns zeroes, fix that
+        public Integer totalExp(){
+            Integer exps = 0;
 
             for(int i = 0; i < expenses.size(); i++){
-                Integer thisExps = Integer.valueOf(expenses.get(i).getCost());
-                exps += thisExps;
+                if(!expenses.get(i).getName().equals("")){
+                    Integer thisExps = Integer.valueOf(expenses.get(i).getCost());
+                    exps += thisExps;
+                }
+
             }
             System.out.println(String.valueOf(exps));
 
@@ -609,7 +633,8 @@ public class Current_trip extends Fragment {
             holder.exp.setText(expense.getName());
             holder.cost.addTextChangedListener(holder.costTextWatcher);
             holder.cost.setText(expense.getCost());
-
+            totalmExpenses = totalExp();
+            currentTrip.setCommonExp(totalmExpenses);
 
 
 
@@ -617,4 +642,5 @@ public class Current_trip extends Fragment {
 
         }
     }
+
 }

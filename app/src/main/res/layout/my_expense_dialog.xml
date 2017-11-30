@@ -27,7 +27,7 @@
         <ListView
             android:id="@+id/my_expense_listView"
             android:layout_width="wrap_content"
-            android:layout_height="350dp"
+            android:layout_height="100dp"
             >
 
         </ListView>
@@ -46,14 +46,14 @@
                 android:id="@+id/totalTEXT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TOTAL: "
+                android:text=""
                 />
 
             <TextView
                 android:id="@+id/totalAMOUNT"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="5454"
+                android:text=""
 
                 />
 
