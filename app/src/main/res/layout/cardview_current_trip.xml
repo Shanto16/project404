@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="16dp"
     android:elevation="18dp"
-    app:cardCornerRadius="4dp">
+    app:cardCornerRadius="6dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -13,41 +13,71 @@
 
         <com.timqi.sectorprogressview.ColorfulRingProgressView
             android:id="@+id/expense_progressbar"
-            android:layout_width="120dp"
-            android:layout_height="120dp"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
             android:layout_centerHorizontal="true"
             android:layout_margin="16dp"
             app:bgColor="#e1e1e1"
-            app:fgColorEnd="#455A64"
-            app:fgColorStart="#90A4AE"
+            app:fgColorEnd="@color/colorPrimary"
+            app:fgColorStart="@color/colorPrimary"
             app:percent="70"
             app:startAngle="0"
-            app:strokeWidth="5dp" />
+            app:strokeWidth="16dp" />
 
-        <TextView
-            android:id="@+id/pcnt_expense"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <com.timqi.sectorprogressview.ColorfulRingProgressView
+            android:id="@+id/animated_progress"
+            android:layout_width="156dp"
+            android:layout_height="156dp"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="56dp"
-            android:textColor="@color/colorAccent"
-            android:textSize="20sp" />
+            app:bgColor="#e1e1e1"
+            app:fgColorEnd="#d4d4d4"
+            app:fgColorStart="#d4d4d4"
+            app:percent="50"
+            android:layout_marginTop="8dp"
+            app:startAngle="120"
+            app:strokeWidth="12dp" />
 
-        <TextView
-            android:id="@+id/spent_card"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/pcnt_expense"
+        <RelativeLayout
+            android:layout_width="92dp"
+            android:layout_height="92dp"
+            android:layout_marginTop="40dp"
+            android:gravity="center"
             android:layout_centerHorizontal="true"
-            android:text="Spent"
-            android:textColor="@color/colorAccent"
-            android:textSize="14sp" />
+            android:background="@drawable/bg_round"
+            >
+
+            <TextView
+                android:id="@+id/pcnt_expense"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/colorPrimary"
+                android:text="70%"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/spent_card"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/pcnt_expense"
+                android:layout_centerHorizontal="true"
+                android:text="Spent"
+                android:textColor="#fff"
+                android:textSize="14sp" />
+
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1.5dp"
+            android:background="@color/colorPrimary"
+            android:layout_below="@+id/expense_progressbar"
+            />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/expense_progressbar"
-            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:orientation="horizontal">
@@ -57,18 +87,29 @@
                 android:id="@+id/current_location_icon"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:padding="4dp"
+                android:padding="6dp"
                 android:scaleType="fitCenter"
-                android:src="@drawable/ic_current_location" />
+                android:src="@drawable/ic_card_current_location" />
 
             <TextView
                 android:id="@+id/current_location_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:layout_marginStart="4dp"
+                android:textSize="11sp"
                 android:text="Thanchi"
-                android:textColor="@color/colorAccent" />
+                android:textColor="@color/font_normal" />
 
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+            <View
+                android:layout_width="1.5dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                />
             <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -79,17 +120,28 @@
                 android:id="@+id/temp_icon"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:padding="4dp"
-                android:src="@drawable/ic_temparature" />
+                android:padding="6dp"
+                android:src="@drawable/ic_card_temp" />
 
             <TextView
                 android:id="@+id/temp_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:layout_marginStart="4dp"
+                android:textSize="11sp"
                 android:text="32°c"
-                android:textColor="@color/colorAccent" />
+                android:textColor="@color/font_normal" />
 
+            <View
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+            <View
+                android:layout_width="1.5dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorPrimary"
+                 />
             <View
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -98,17 +150,20 @@
 
             <ImageView
                 android:id="@+id/weather_icon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_weather" />
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_card_cloud"
+                android:padding="6dp"/>
 
             <TextView
                 android:id="@+id/weather_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Cloudy"
-                android:textColor="@color/colorAccent" />
+                android:text="Mostly Rain"
+                android:textSize="11sp"
+                android:layout_marginStart="4dp"
+                android:textColor="@color/font_normal" />
 
         </LinearLayout>
 

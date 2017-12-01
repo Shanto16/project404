@@ -64,12 +64,12 @@ import static mcgyvers.mobitrip.R.id.toolbar;
 
 public class Current_trip extends Fragment implements MemberData.onItemClickListener{
 
-    float max = 5000, min = 1200;
+    float max = 5000, min = 3800;
 
     float pcnt = (min / max) * 100;
 
     TextView _expense,spent,currentLocation, temp,weather;
-    ColorfulRingProgressView expenseProgress;
+    ColorfulRingProgressView expenseProgress,animated_progress_show;
     Toolbar mToolbar;
 
     Trip currentTrip = null;
@@ -83,7 +83,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
     private static final int MY_PERMISSION_REQUEST_LOCATION=1;
 
-    Button team_expense, my_expense,hospitals,policeStation,maps,camera,restaurants,hotels,fuel,spots,dismiss,finish;
+    Button team_expense, my_expense,hospitals,policeStation,maps,camera,restaurants,hotels,fuel,spots,finish;
 
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
@@ -97,12 +97,16 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
         Typeface regular = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Regular.ttf");
         Typeface bold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Bold.ttf");
+        Typeface firaSans_medium = Typeface.createFromAsset(getActivity().getAssets(),"fonts/FiraSans-Medium.ttf");
+        Typeface firaSans_semiBold = Typeface.createFromAsset(getActivity().getAssets(),"fonts/FiraSans-Medium.ttf");
+        Typeface amaranth = Typeface.createFromAsset(getActivity().getAssets(),"fonts/Amaranth-Bold.ttf");
 
 
 
         team_expense = rootView.findViewById(R.id.team_expense_button);
         my_expense = rootView.findViewById(R.id.my_expense_button);
         expenseProgress = rootView.findViewById(R.id.expense_progressbar);
+        animated_progress_show = rootView.findViewById(R.id.animated_progress);
         _expense = rootView.findViewById(R.id.pcnt_expense);
         spent = rootView.findViewById(R.id.spent_card);
         currentLocation = rootView.findViewById(R.id.current_location_text);
@@ -117,7 +121,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         hotels = rootView.findViewById(R.id.nav_hotels);
         fuel = rootView.findViewById(R.id.nav_fuel);
         spots = rootView.findViewById(R.id.nav_spots);
-        dismiss = rootView.findViewById(R.id.nav_dismiss);
         finish = rootView.findViewById(R.id.nav_finish);
 
 
@@ -158,7 +161,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         hotels.setTransformationMethod(null);
         fuel.setTransformationMethod(null);
         spots.setTransformationMethod(null);
-        dismiss.setTransformationMethod(null);
         finish.setTransformationMethod(null);
         team_expense.setTransformationMethod(null);
         my_expense.setTransformationMethod(null);
@@ -171,26 +173,25 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
 
 
-        hospitals.setTypeface(regular);
-        policeStation.setTypeface(regular);
-        maps.setTypeface(regular);
-        camera.setTypeface(regular);
-        restaurants.setTypeface(regular);
-        hotels.setTypeface(regular);
-        fuel.setTypeface(regular);
-        spots.setTypeface(regular);
-        dismiss.setTypeface(regular);
-        finish.setTypeface(regular);
-        team_expense.setTypeface(regular);
-        my_expense.setTypeface(regular);
-        weather.setTypeface(regular);
-        temp.setTypeface(regular);
-        currentLocation.setTypeface(regular);
-        camera.setTypeface(regular);
+        hospitals.setTypeface(firaSans_semiBold);
+        policeStation.setTypeface(firaSans_semiBold);
+        maps.setTypeface(firaSans_semiBold);
+        camera.setTypeface(firaSans_semiBold);
+        restaurants.setTypeface(firaSans_semiBold);
+        hotels.setTypeface(firaSans_semiBold);
+        fuel.setTypeface(firaSans_semiBold);
+        spots.setTypeface(firaSans_semiBold);
+        finish.setTypeface(firaSans_semiBold);
+        team_expense.setTypeface(firaSans_semiBold);
+        my_expense.setTypeface(firaSans_semiBold);
+        weather.setTypeface(firaSans_semiBold);
+        temp.setTypeface(firaSans_semiBold);
+        currentLocation.setTypeface(firaSans_semiBold);
+        camera.setTypeface(firaSans_semiBold);
 
 
-        _expense.setTypeface(bold);
-        spent.setTypeface(bold);
+        _expense.setTypeface(amaranth);
+        spent.setTypeface(amaranth);
 
 
 
@@ -253,6 +254,9 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
         expenseProgress.setPercent(pcnt);
         _expense.setText(Float.toString(pcnt)+"%");
+        animated_progress_show.setPercent(pcnt);
+        animated_progress_show.animateIndeterminate(2500,null);
+
 
         my_expense.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -289,12 +293,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                     expenses.addAll(currentTrip.getExpenses());
                 }
 
-                if(expensesAdapter.getCount() > 5){
-                    View item = expensesAdapter.getView(0, null, myExpenseList);
-                    item.measure(0, 0);
-                    ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (5.5 * item.getMeasuredHeight()));
-                    myExpenseList.setLayoutParams(params);
-                }
 
 
 
@@ -329,7 +327,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                     public void onClick(View view) {
 
 
-                        Expense expense = new Expense("", "");
+                        Expense expense = new Expense("", "0");
 
                         expenses.add(0, expense);
                         expensesAdapter.notifyDataSetChanged();
