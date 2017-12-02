@@ -2,6 +2,9 @@ package mcgyvers.mobitrip.dataModels;
 
 /**
  * Created by edson on 09/09/17.
+ *
+ * member class
+ *
  */
 
 public class Member {
@@ -9,6 +12,7 @@ public class Member {
     private String name;
     private String phone;
     private String amount;
+    private String expense;
 
     public Member(){}
 
@@ -16,6 +20,7 @@ public class Member {
         this.name = name;
         this.phone = phone;
         this.amount = amount;
+        this.expense = "0";
     }
 
     public String getName() {
@@ -40,5 +45,13 @@ public class Member {
 
     public void setAmount(String amount) {
         this.amount = amount;
+    }
+
+    public String getExpense() {
+        return expense;
+    }
+
+    public void setExpense(String expense) {
+        this.expense = expense;
     }
 }

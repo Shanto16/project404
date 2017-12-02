@@ -51,6 +51,7 @@ import java.util.Locale;
 
 import mcgyvers.mobitrip.adapters.MemberData;
 import mcgyvers.mobitrip.dataModels.Expense;
+import mcgyvers.mobitrip.dataModels.Member;
 import mcgyvers.mobitrip.dataModels.Trip;
 
 import static mcgyvers.mobitrip.R.id.all;
@@ -326,12 +327,12 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                     @Override
                     public void onClick(View view) {
 
-
+                        mTotal.setText(String.valueOf(totalmExpenses));
                         Expense expense = new Expense("", "0");
 
                         expenses.add(0, expense);
                         expensesAdapter.notifyDataSetChanged();
-                        mTotal.setText(String.valueOf(totalmExpenses));
+
 
 
                     }
@@ -352,12 +353,24 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 dialog.setContentView(R.layout.model_team_expense);
                 dialog.setTitle("Team Expense");
 
+
+
                 ListView team_expense = dialog.findViewById(R.id.team_expense_listview);
                 Button ok_button = dialog.findViewById(R.id.team_expense_dismiss);
+
+                final ArrayList<Member> members = new ArrayList<>();
+                members.addAll(currentTrip.getMembers());
+                final MemberExpAdapter memberExpAdapter = new MemberExpAdapter(members);
+                team_expense.setAdapter(memberExpAdapter);
 
                 ok_button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+
+                        currentPos = getCurrentPos(getContext());
+                        memberExpAdapter.notifyDataSetChanged();
+                        currentTrip.setMembers(members);
+                        UpdateTripList(getContext(),currentTrip, currentPos);
 
                         dialog.dismiss();
                     }
@@ -467,6 +480,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         expenses.remove(pos);
         expensesAdapter.notifyDataSetChanged();
 
+
     }
 
 
@@ -544,6 +558,91 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         private EditText cost;
         private TextWatcher costTextWatcher, expTextWatcher;
         private ImageView remove;
+
+        private TextView memberName;
+        private EditText memberExpense;
+        private TextWatcher memberExpenseWatcher;
+    }
+
+    public class MemberExpAdapter extends BaseAdapter{
+
+        private final ArrayList<Member> members;
+
+        public MemberExpAdapter(ArrayList<Member> members){
+            this.members = members;
+        }
+
+        @Override
+        public int getCount() {
+            return members.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return members.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            final Member member = members.get(position);
+
+            View view = convertView;
+            if(view == null){
+                // not recycled, inflate a new view
+
+                view = getLayoutInflater().inflate(R.layout.team_expense_model, null);
+                ViewHolder viewHolder = new ViewHolder();
+                viewHolder.memberExpense = view.findViewById(R.id.expense_expense_edit);
+                viewHolder.memberName = view.findViewById(R.id.expense_name_text);
+                view.setTag(viewHolder);
+
+
+
+            }
+
+            ViewHolder holder = (ViewHolder) view.getTag();
+
+            holder.memberName.setText(member.getName());
+
+            if(member.getExpense() == null){
+                holder.memberExpense.setText("0");
+            }else holder.memberExpense.setText(member.getExpense());
+
+            // Remove any existing TextWatcher that will be keyed to the wrong ListItem
+            if(holder.memberExpenseWatcher != null)
+                holder.memberExpense.removeTextChangedListener(holder.memberExpenseWatcher);
+
+            holder.memberExpenseWatcher = new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    member.setExpense(s.toString());
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            };
+
+            holder.memberExpense.addTextChangedListener(holder.memberExpenseWatcher);
+
+
+
+
+            return view;
+        }
     }
 
 
@@ -593,6 +692,8 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
 
+            totalmExpenses = totalExp();
+            currentTrip.setCommonExp(totalmExpenses);
 
             View view = convertView;
             if(view == null){
@@ -631,6 +732,8 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
                     expense.setCost(s.toString());
+                    totalmExpenses = totalExp();
+                    currentTrip.setCommonExp(totalmExpenses);
 
                 }
 
@@ -665,12 +768,12 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 }
             });
 
+
             holder.exp.addTextChangedListener(holder.expTextWatcher);
             holder.exp.setText(expense.getName());
             holder.cost.addTextChangedListener(holder.costTextWatcher);
             holder.cost.setText(expense.getCost());
-            totalmExpenses = totalExp();
-            currentTrip.setCommonExp(totalmExpenses);
+
 
 
 
@@ -678,5 +781,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
         }
     }
+
+
 
 }
