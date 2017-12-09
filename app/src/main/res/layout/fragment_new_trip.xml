@@ -1,187 +1,431 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v4.widget.NestedScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="8dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@color/background"
+    >
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="16dp"
+       android:orientation="vertical">
+
+       <android.support.v7.widget.CardView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           app:cardCornerRadius="8dp"
+           android:layout_marginStart="16dp"
+           android:layout_marginEnd="16dp"
+           app:cardElevation="0dp"
+           android:layout_marginBottom="8dp"
+           >
+
+           <FrameLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               >
+               <ImageView
+                   android:layout_width="match_parent"
+                   android:layout_height="180dp"
+                   android:src="@drawable/bg_new_trip"
+                   android:scaleType="fitXY"
+                   />
+
+               <EditText
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center"
+                   android:id="@+id/trip_name"
+                   android:layout_marginStart="50dp"
+                   android:hint="Edit Trip Name"
+                   android:gravity="center"
+                   android:textSize="20sp"
+                   android:inputType="textMultiLine"
+                   android:textColor="@color/colorPrimary"
+                   android:layout_marginTop="-30dp"
+                   android:background="@drawable/edit_trip_name"
+                   android:layout_marginEnd="50dp"/>
+
+           </FrameLayout>
+
+       </android.support.v7.widget.CardView>
+
+
+       <android.support.v7.widget.CardView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:background="@color/colorPrimary"
+           android:layout_marginStart="16dp"
+           app:cardElevation="0dp"
+           android:layout_marginEnd="16dp"
+           app:cardCornerRadius="8dp">
+
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content">
+
+               <ImageView
+                   android:id="@+id/from_toIV"
+                   android:layout_width="25dp"
+                   android:layout_height="180dp"
+                   android:layout_marginStart="26dp"
+                   android:src="@drawable/from_to"/>
+
+               <TextView
+                   android:id="@+id/start_point"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Start Point"
+                   android:layout_toEndOf="@+id/from_toIV"
+                   android:layout_marginTop="35dp"
+                   android:textSize="14sp"
+                   android:textColor="@color/font_title"/>
+
+               <EditText
+                   android:id="@+id/from_journey"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:hint="Where are you starting from ?"
+                   android:textSize="12sp"
+                   android:layout_marginEnd="32dp"
+                   android:layout_below="@+id/start_point"
+                   android:layout_alignStart="@+id/start_point"
+                   />
+
+               <TextView
+                   android:id="@+id/end_point"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="End Point"
+                   android:layout_toEndOf="@+id/from_toIV"
+                   android:layout_marginTop="26dp"
+                   android:textSize="14sp"
+                   android:textColor="@color/font_title"
+                   android:layout_below="@+id/from_journey"/>
+
+               <EditText
+                   android:id="@+id/destination"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:hint="Where are you going ?"
+                   android:textSize="12sp"
+                   android:layout_marginEnd="32dp"
+                   android:layout_below="@+id/end_point"
+                   android:layout_alignStart="@+id/start_point"
+                   android:layout_marginBottom="32dp"
+                   />
+
+           </RelativeLayout>
+
+       </android.support.v7.widget.CardView>
+
+
+       <android.support.v7.widget.CardView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:background="@color/colorPrimary"
+           android:layout_marginStart="16dp"
+           app:cardElevation="0dp"
+           android:layout_marginEnd="16dp"
+           app:cardCornerRadius="8dp"
+           android:layout_marginTop="8dp">
+
+           <LinearLayout
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_gravity="center"
+               android:orientation="horizontal">
+               <ImageView
+                   android:layout_width="30dp"
+                   android:layout_height="30dp"
+                   android:layout_marginTop="12dp"
+                   android:src="@drawable/ic_download"
+                   android:padding="8dp"
+                   android:layout_marginStart="8dp"/>
+
+               <LinearLayout
+                   android:layout_width="0dp"
+                   android:layout_weight="1"
+                   android:layout_height="wrap_content"
+                   android:layout_marginTop="16dp"
+                   android:layout_marginBottom="16dp"
+                   android:orientation="vertical">
+                   <TextView
+                       android:id="@+id/download_mapTXT"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:text="Download Map"
+                       android:textSize="14sp"
+                       android:textColor="@color/font_title"/>
+
+                   <TextView
+                       android:id="@+id/download_map_helper"
+                       android:layout_width="wrap_content"
+                       android:layout_height="wrap_content"
+                       android:text="@string/download_map_for"
+                       android:textSize="11sp"
+                       android:layout_marginTop="8dp"
+                       android:layout_marginEnd="8dp"
+                       android:textColor="@color/font_normal"/>
+               </LinearLayout>
+
+               <ImageView
+                   android:layout_width="30dp"
+                   android:layout_height="30dp"
+                   android:src="@drawable/ic_down"
+                   android:scaleType="centerCrop"
+                   android:padding="-25dp"
+                   android:layout_gravity="center_vertical"
+                   android:layout_marginEnd="32dp"
+                   android:background="#dfdfdf"
+                   />
+
+
+           </LinearLayout>
+       </android.support.v7.widget.CardView>
 
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+       <android.support.v7.widget.CardView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:background="@color/colorPrimary"
+           android:layout_marginStart="16dp"
+           android:layout_marginEnd="16dp"
+           android:layout_marginBottom="8dp"
+           app:cardCornerRadius="8dp"
+           app:cardElevation="0dp"
+           android:layout_marginTop="8dp">
 
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="vertical">
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="4dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:elevation="4dp">
+               <LinearLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center"
+                   android:orientation="horizontal">
+                   <ImageView
+                       android:layout_width="48dp"
+                       android:layout_height="30dp"
+                       android:layout_marginTop="12dp"
+                       android:scaleType="centerCrop"
+                       android:padding="-8dp"
+                       android:src="@drawable/ic_calendar"
+                       android:layout_marginStart="8dp"/>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                   <LinearLayout
+                       android:layout_width="0dp"
+                       android:layout_weight="1"
+                       android:layout_height="wrap_content"
+                       android:layout_marginTop="16dp"
+                       android:layout_marginBottom="16dp"
+                       android:orientation="vertical">
+                       <TextView
+                           android:id="@+id/sDate"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:text="Select Date"
+                           android:textSize="14sp"
+                           android:textColor="@color/font_title"/>
 
-                <com.rengwuxian.materialedittext.MaterialEditText
-                    android:id="@+id/trip_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:met_floatingLabel="highlight"
-                    app:met_floatingLabelText="Trip title"
-                    android:hint="Trip title"
-                    android:ems="15"
-                    app:met_iconLeft="@drawable/ic_start_point"
-                    app:met_iconPadding="0dp"
-                    app:met_minCharacters="2"
-                    />
+                       <io.blackbox_vision.datetimepickeredittext.view.DatePickerEditText
+                           android:id="@+id/et_trip_date"
+                           android:layout_width="match_parent"
+                           android:layout_height="wrap_content"
+                           android:ems="15"
+                           android:textSize="11sp"
+                           android:layout_marginEnd="32dp"
+                           android:backgroundTint="@color/font_normal"
+                           android:hint="Select the date of departure"/>
+                   </LinearLayout>
+               </LinearLayout>
 
-                <com.rengwuxian.materialedittext.MaterialEditText
-                    android:id="@+id/from_journey"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:met_floatingLabel="highlight"
-                    app:met_floatingLabelText="From"
-                    android:hint="From"
-                    android:ems="15"
-                    app:met_iconLeft="@drawable/ic_start_point"
-                    app:met_iconPadding="0dp"
-                    app:met_minCharacters="2"
-                    />
+               <LinearLayout
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:layout_gravity="center"
+                   android:orientation="horizontal">
+                   <ImageView
+                       android:layout_width="48dp"
+                       android:layout_height="30dp"
+                       android:layout_marginTop="12dp"
+                       android:scaleType="centerCrop"
+                       android:padding="-8dp"
+                       android:src="@drawable/ic_calendar"
+                       android:layout_marginStart="8dp"/>
 
+                   <LinearLayout
+                       android:layout_width="0dp"
+                       android:layout_weight="1"
+                       android:layout_height="wrap_content"
+                       android:layout_marginTop="16dp"
+                       android:layout_marginBottom="16dp"
+                       android:orientation="vertical">
+                       <TextView
+                           android:id="@+id/sTime"
+                           android:layout_width="wrap_content"
+                           android:layout_height="wrap_content"
+                           android:text="Select Time"
+                           android:textSize="14sp"
+                           android:textColor="@color/font_title"/>
 
+                       <com.rengwuxian.materialedittext.MaterialEditText
+                           android:id="@+id/et_trip_time"
+                           android:layout_width="match_parent"
+                           android:layout_height="wrap_content"
+                           android:hint="Select the time of your departure"
+                           android:textSize="11sp"
+                           android:layout_marginEnd="32dp"
+                           />
+                   </LinearLayout>
+               </LinearLayout>
 
-                <com.rengwuxian.materialedittext.MaterialEditText
-                    android:id="@+id/destination"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:met_floatingLabel="highlight"
-                    app:met_floatingLabelText="Destination"
-                    android:hint="Destination"
-                    android:ems="15"
-                    app:met_iconLeft="@drawable/ic_end_point"
-                    app:met_iconPadding="0dp"
-                    app:met_minCharacters="2"
-                    />
-
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Download map"
-                    android:textColor="@color/colorAccent"
-                    android:backgroundTint="@color/colorAccent"
-                    android:layout_marginStart="-16dp"
-                    android:layout_marginEnd="8dp"
-                    android:textSize="20sp"
-                    android:scaleX="0.70"
-                    android:scaleY="0.70"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/radio_sub_text"
-                    android:textSize="12sp"
-                    android:layout_marginTop="-8dp"
-                    android:layout_marginStart="33dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:textColor="#9e9e9e"/>
-
-            </LinearLayout>
-
-
-
-        </android.support.v7.widget.CardView>
-
-
-
-        <io.blackbox_vision.datetimepickeredittext.view.DatePickerEditText
-            android:id="@+id/et_trip_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ems="15"
-            android:drawableLeft="@drawable/ic_trip_date"
-            android:layout_marginStart="14dp"
-            android:layout_marginBottom="8dp"
-            android:backgroundTint="@color/colorAccent"
-            android:hint="Select Date"/>
-
-
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/et_trip_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="Departure time"
-            android:hint="Departure time"
-            android:ems="15"
-            app:met_iconLeft="@drawable/ic_start_point"
-            app:met_iconPadding="0dp"
-            app:met_minCharacters="2"
-            />
+           </LinearLayout>
 
 
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/amount_per"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="Amount per person"
-            android:hint="Amount per person"
-            android:ems="15"
-            app:met_iconLeft="@drawable/ic_amount_per_head"
-            app:met_iconPadding="0dp"
-            android:foregroundTint="@color/colorAccent"
-            />
+       </android.support.v7.widget.CardView>
 
 
-        <com.rengwuxian.materialedittext.MaterialEditText
-            android:id="@+id/common_expense"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:met_floatingLabel="highlight"
-            app:met_floatingLabelText="Common expenditure"
-            android:hint="Common expenditure"
-            android:ems="15"
-            app:met_iconLeft="@drawable/ic_amount_per_head"
-            app:met_iconPadding="0dp"
-            android:foregroundTint="@color/colorAccent"
-            />
+       <android.support.v7.widget.CardView
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:background="@color/colorPrimary"
+           android:layout_marginStart="16dp"
+           android:layout_marginEnd="16dp"
+           app:cardElevation="0dp"
+           android:layout_marginBottom="8dp"
+           app:cardCornerRadius="8dp">
 
-        <Button
-            android:id="@+id/membersDetails"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="  Member Informations"
-            android:layout_gravity="center_horizontal"
-            android:drawableLeft="@drawable/ic_members"/>
+           <RelativeLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content">
+
+               <ImageView
+                   android:id="@+id/costsIV"
+                   android:layout_width="25dp"
+                   android:layout_height="180dp"
+                   android:layout_marginStart="26dp"
+                   android:src="@drawable/from_to"/>
+
+               <TextView
+                   android:id="@+id/perpersonTXT"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Amount Per Person"
+                   android:layout_toEndOf="@+id/costsIV"
+                   android:layout_marginTop="35dp"
+                   android:textSize="14sp"
+                   android:textColor="@color/font_title"/>
+
+               <EditText
+                   android:id="@+id/amount_per"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:hint="Minimum Expense for the trip"
+                   android:textSize="12sp"
+                   android:layout_marginEnd="32dp"
+                   android:inputType="number|numberDecimal"
+                   android:layout_below="@+id/perpersonTXT"
+                   android:layout_alignStart="@+id/perpersonTXT"
+                   />
+
+               <TextView
+                   android:id="@+id/commonTXT"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Common Expense"
+                   android:layout_toEndOf="@+id/costsIV"
+                   android:layout_marginTop="26dp"
+                   android:textSize="14sp"
+                   android:textColor="@color/font_title"
+                   android:layout_below="@+id/amount_per"/>
+
+               <EditText
+                   android:id="@+id/common_expense"
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content"
+                   android:hint="This amount will be spent from everyone"
+                   android:textSize="12sp"
+                   android:layout_marginEnd="32dp"
+                   android:inputType="number|numberDecimal"
+                   android:layout_below="@+id/commonTXT"
+                   android:layout_alignStart="@+id/amount_per"
+                   android:layout_marginBottom="32dp"
+                   />
+           </RelativeLayout>
+
+       </android.support.v7.widget.CardView>
+
+       <android.support.v7.widget.CardView
+           android:id="@+id/membersDetails"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:background="@color/colorPrimary"
+           android:layout_marginStart="16dp"
+           android:layout_marginEnd="16dp"
+           app:cardElevation="0dp"
+           android:layout_marginBottom="8dp"
+           app:cardCornerRadius="8dp">
+
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:gravity="center_vertical"
+               android:orientation="horizontal">
+
+               <ImageView
+                   android:layout_width="70dp"
+                   android:layout_height="70dp"
+                   android:layout_marginStart="16dp"
+                   android:scaleType="centerCrop"
+                   android:src="@drawable/ic_members_info"/>
+
+               <TextView
+                   android:id="@+id/member_infoTXT"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:text="Members Information"
+                   android:textSize="16sp"
+                   android:layout_weight="1"
+                   android:layout_marginStart="16dp"
+                   android:textColor="@color/font_title"/>
+
+               <ImageView
+                   android:layout_width="30dp"
+                   android:layout_height="30dp"
+                   android:scaleType="centerCrop"
+                   android:padding="6dp"
+                   android:layout_marginEnd="32dp"
+                   android:src="@drawable/right_arrow"
+                   />
+           </LinearLayout>
+       </android.support.v7.widget.CardView>
+
+
+
+       <Button
+           android:id="@+id/start_trip_button"
+           android:layout_width="280dp"
+           android:layout_height="wrap_content"
+           android:text="Start Trip"
+           android:layout_gravity="center_horizontal"
+           android:background="@drawable/save_trip"
+           android:layout_marginTop="50dp"
+           android:layout_marginBottom="30dp"
+           android:textColor="#ffffff"
+           />
 
 
 
 
-        <Button
-            android:id="@+id/start_trip_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="  Start Trip"
-            android:layout_gravity="center_horizontal"
-            android:drawableLeft="@drawable/ic_add_new"/>
-
-
-    </LinearLayout>
-
-
-
-
-
+   </LinearLayout>
 
 
 </android.support.v4.widget.NestedScrollView>

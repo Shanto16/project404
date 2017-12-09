@@ -6,6 +6,34 @@
     android:orientation="vertical">
 
 
+    <TextView
+        android:id="@+id/upcomingTXT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upcoming Trips"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="20sp"/>
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/my_upcoming_trips_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp">
+
+    </android.support.v7.widget.RecyclerView>
+
+
+
+    <TextView
+        android:id="@+id/completedTXT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Completed Trips"
+        android:textColor="@color/colorPrimaryDark"
+        android:layout_marginTop="30dp"
+        android:textSize="20sp"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/my_trips_recyclerView"
         android:layout_width="match_parent"
@@ -13,7 +41,5 @@
         android:paddingTop="16dp">
 
     </android.support.v7.widget.RecyclerView>
-
-
 
 </LinearLayout>

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Typeface;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Build;
@@ -14,11 +15,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -51,8 +55,11 @@ import mcgyvers.mobitrip.dataModels.Trip;
 public class NewTrip extends Fragment {
 
     //SimpleDateFormat date;
-    Button members,start;
-    MaterialEditText from,destination,amount,commonexpense,tripName,departureTime;
+    TextView startp,endP,Dmap,Sdate,Stime,ApP,Cexpense,memberInfoTXT,DmapHelper;
+    Button save;
+    CardView members;
+    MaterialEditText departureTime;
+    EditText from,destination,amount,commonexpense,tripName;
 
     static final int DIALOG_ID = 0;
     int hour,minute;
@@ -76,13 +83,25 @@ public class NewTrip extends Fragment {
 
         members = rootView.findViewById(R.id.membersDetails);
         trip_date = rootView.findViewById(R.id.et_trip_date);
-        start = rootView.findViewById(R.id.start_trip_button);
+        save = rootView.findViewById(R.id.start_trip_button);
         from = rootView.findViewById(R.id.from_journey);
         destination = rootView.findViewById(R.id.destination);
         amount = rootView.findViewById(R.id.amount_per);
         commonexpense = rootView.findViewById(R.id.common_expense);
         tripName = rootView.findViewById(R.id.trip_name);
         departureTime = rootView.findViewById(R.id.et_trip_time);
+
+        startp = rootView.findViewById(R.id.start_point);
+        endP = rootView.findViewById(R.id.end_point);
+        Dmap = rootView.findViewById(R.id.download_mapTXT);
+        Sdate = rootView.findViewById(R.id.sDate);
+        Stime = rootView.findViewById(R.id.sTime);
+        ApP = rootView.findViewById(R.id.perpersonTXT);
+        Cexpense = rootView.findViewById(R.id.commonTXT);
+        memberInfoTXT = rootView.findViewById(R.id.member_infoTXT);
+        DmapHelper = rootView.findViewById(R.id.download_map_helper);
+
+
 
 
         from.setFocusable(false);
@@ -93,6 +112,30 @@ public class NewTrip extends Fragment {
 
         departureTime.setFocusable(false);
         departureTime.setKeyListener(null);
+
+        Typeface firaSans_medium = Typeface.createFromAsset(getActivity().getAssets(),"fonts/FiraSans-Medium.ttf");
+        Typeface firaSans_semiBold = Typeface.createFromAsset(getActivity().getAssets(),"fonts/FiraSans-Medium.ttf");
+        Typeface amaranth = Typeface.createFromAsset(getActivity().getAssets(),"fonts/Amaranth-Bold.ttf");
+        startp.setTypeface(firaSans_semiBold);
+        endP.setTypeface(firaSans_semiBold);
+        Dmap.setTypeface(firaSans_semiBold);
+        Sdate.setTypeface(firaSans_semiBold);
+        Stime.setTypeface(firaSans_semiBold);
+        ApP.setTypeface(firaSans_semiBold);
+        Cexpense.setTypeface(firaSans_semiBold);
+        memberInfoTXT.setTypeface(firaSans_semiBold);
+        save.setTypeface(firaSans_semiBold);
+        tripName.setTypeface(amaranth);
+
+        trip_date.setTypeface(firaSans_medium);
+        from.setTypeface(firaSans_medium);
+        destination.setTypeface(firaSans_medium);
+        amount.setTypeface(firaSans_medium);
+        commonexpense.setTypeface(firaSans_medium);
+        departureTime.setTypeface(firaSans_medium);
+
+
+
 
 
 
@@ -158,7 +201,7 @@ public class NewTrip extends Fragment {
             }
         });
 
-        start.setOnClickListener(new View.OnClickListener() {
+        save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //TODO:check if amounts are numbers

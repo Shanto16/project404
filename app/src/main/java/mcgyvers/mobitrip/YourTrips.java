@@ -2,6 +2,7 @@ package mcgyvers.mobitrip;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -32,7 +33,8 @@ import mcgyvers.mobitrip.dataModels.Trip;
 
 public class YourTrips extends Fragment {
 
-    RecyclerView my_trips;
+    RecyclerView my_trips,my_upcoming_trips;
+    TextView upcoming,completed;
 
 
     //****FOR MODEL****
@@ -56,6 +58,9 @@ public class YourTrips extends Fragment {
 
 
         my_trips = rootView.findViewById(R.id.my_trips_recyclerView);
+        my_upcoming_trips = rootView.findViewById(R.id.my_upcoming_trips_recyclerView);
+        upcoming = rootView.findViewById(R.id.upcomingTXT);
+        completed = rootView.findViewById(R.id.completedTXT);
 
         trip_bg = rootView.findViewById(R.id.bg_trip);
         trip_dateStart = rootView.findViewById(R.id.tour_date_start);
@@ -64,6 +69,13 @@ public class YourTrips extends Fragment {
         trip_members = rootView.findViewById(R.id.tour_team_size);
         trip_expense = rootView.findViewById(R.id.tour_avg_expense);
         date_txt = rootView.findViewById(R.id.tour_date_text);
+
+
+        Typeface firaSans_medium = Typeface.createFromAsset(getActivity().getAssets(),"fonts/FiraSans-Medium.ttf");
+        Typeface firaSans_semiBold = Typeface.createFromAsset(getActivity().getAssets(),"fonts/FiraSans-Medium.ttf");
+        Typeface amaranth = Typeface.createFromAsset(getActivity().getAssets(),"fonts/Amaranth-Bold.ttf");
+        upcoming.setTypeface(firaSans_semiBold);
+        completed.setTypeface(firaSans_semiBold);
 
 
         mAdaper = new TripData(tripList, getContext());
