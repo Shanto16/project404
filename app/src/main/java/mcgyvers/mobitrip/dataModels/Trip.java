@@ -27,6 +27,9 @@ public class Trip {
 
     private ArrayList<Expense> expenses;
 
+    //newly added:
+    private String name;
+
     public Trip(){}
 
     public Trip(String origin, String destination, Integer amount, Integer commonExp, ArrayList<Member> Members, String date, String tripId, ArrayList<Expense> expenses){
@@ -41,6 +44,7 @@ public class Trip {
         this.members = new ArrayList<>();
         this.tripId = tripId; //later on generate them upon checking the local storage
         this.expenses = expenses;
+        this.name = "";
     }
 
     public void setDestPlace(AtPlace destPlace){ this.destPlace = destPlace;}
@@ -128,5 +132,14 @@ public class Trip {
 
     public void setExpenses(ArrayList<Expense> expenses) {
         this.expenses = expenses;
+    }
+
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -91,6 +91,9 @@ public class NewTrip extends Fragment {
         tripName = rootView.findViewById(R.id.trip_name);
         departureTime = rootView.findViewById(R.id.et_trip_time);
 
+        amount.setText("0");
+        commonexpense.setText("0");
+
         startp = rootView.findViewById(R.id.start_point);
         endP = rootView.findViewById(R.id.end_point);
         Dmap = rootView.findViewById(R.id.download_mapTXT);
@@ -144,6 +147,10 @@ public class NewTrip extends Fragment {
             Gson gson = new Gson();
             String dest = tmpShared.getString(MainActivity.DESTINATION, "");
             String origin = tmpShared.getString(MainActivity.ORIGIN,"");
+            String tripNm = tmpShared.getString(MainActivity.TRIPNAME, "");
+            String commonexp = tmpShared.getString(MainActivity.COMMONEXP, "");
+            String amnt = tmpShared.getString(MainActivity.AMOUNT, "");
+
             if(!dest.equals("")){
                 desti = gson.fromJson(dest, AtPlace.class);
                 destination.setText(desti.getName() + ", " + desti.getAdress());
@@ -154,6 +161,17 @@ public class NewTrip extends Fragment {
                 from.setText(or.getName() + ", " + or.getAdress());
             }
 
+            if (!tripNm.equals("")) {
+                tripName.setText(tripNm);
+            }
+
+            if(!commonexp.equals("")){
+                commonexpense.setText(commonexp);
+            }
+
+            if(!amnt.equals("")){
+                amount.setText(amnt);
+            }
         }
 
         departureTime.setOnClickListener(new View.OnClickListener() {
@@ -239,12 +257,14 @@ public class NewTrip extends Fragment {
      */
     void saveCurrentConfigs(){
 
+        System.out.println("saving current configs:");
         tmpShared = getActivity().getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
         tmpEditor = tmpShared.edit();
 
         tmpEditor.putString(MainActivity.AMOUNT, amount.getText().toString());
         tmpEditor.putString(MainActivity.COMMONEXP, commonexpense.getText().toString());
         tmpEditor.putString(MainActivity.TRIPDATE, trip_date.toString());
+        tmpEditor.putString(MainActivity.TRIPNAME, tripName.getText().toString());
 
 
         tmpEditor.apply();
@@ -281,6 +301,12 @@ public class NewTrip extends Fragment {
         long tripsN = sharedPreferences.getLong(getString(R.string.trip_count), 0);
 
         Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(tripId), null);
+
+        // setting the name of the trip
+        if(tripName.getText().toString() != ""){
+            trip.setName(tripName.getText().toString());
+        }
+
 
         //getting the list of members currently on the temporary trip file
         ArrayList<Member> m = Current_trip_member_information.getMembers(getContext());
@@ -336,6 +362,8 @@ public class NewTrip extends Fragment {
         amount.setText("");
         commonexpense.setText("");
         trip_date.setText("");
+        tripName.setText("");
+        departureTime.setText("");
 
     }
 

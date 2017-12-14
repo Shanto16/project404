@@ -1,6 +1,8 @@
 package mcgyvers.mobitrip;
 
 import android.app.Fragment;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -33,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String TRIPDATE = "tripdate";
     public static final String MEMBERS = "members";
     public static final String TRIPID = "tripId";
+    public static final String TRIPNAME = "tripName";
 
     Toolbar mainToolbar;
     DrawerLayout drawerLayout;
@@ -72,6 +75,10 @@ public class MainActivity extends AppCompatActivity {
             switchFragment(b.getInt("fragToLoad"));
 
         }
+
+        Notifications notifications = new Notifications();
+        notifications.notify(getApplicationContext());
+
 
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override

@@ -55,6 +55,8 @@ public class TripData extends RecyclerView.Adapter<TripData.MyViewHolder> {
         final Trip trip = trips.get(pos);
         System.out.println("adapter trip origin: ");
         System.out.println(trip.getOrigin());
+        System.out.println("trip date: ");
+        System.out.println(trip.getDate());
 
         if(trip.getOriginPlace() != null){
             holder.trip_route.setText("From "+trip.getOriginPlace().getName().toUpperCase() + " to " + trip.getDestPlace().getName().toUpperCase());
@@ -74,6 +76,13 @@ public class TripData extends RecyclerView.Adapter<TripData.MyViewHolder> {
             }
         });
         //holder.trip_bg.setImageResource();//
+
+        if(trip.getName() != ""){
+            holder.tour_name.setText(trip.getName());
+        }else{
+            holder.tour_name.setText("From "+trip.getOriginPlace().getName().toUpperCase() + " to " + trip.getDestPlace().getName().toUpperCase());
+        }
+
 
 
     }

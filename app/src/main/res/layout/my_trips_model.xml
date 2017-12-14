@@ -87,7 +87,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_alignTop="@+id/tour_name"
-                    android:text="9/11/2017 - "
+                    android:text=""
                     android:textColor="@color/font_normal"
                     android:textSize="10sp" />
 
@@ -97,7 +97,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:layout_alignTop="@+id/tour_name"
-                    android:text="15/11/2017"
+                    android:text=""
                     android:textColor="@color/font_normal"
                     android:textSize="10sp" />
 

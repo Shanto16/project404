@@ -22,7 +22,10 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import mcgyvers.mobitrip.adapters.TripData;
 import mcgyvers.mobitrip.dataModels.Trip;
@@ -46,8 +49,10 @@ public class YourTrips extends Fragment {
     TextView date_txt,avg_txt;
 
     private ArrayList<Trip> tripList = new ArrayList<>();
-    private TripData mAdaper;
+    private ArrayList<Trip> upcomingTripLst = new ArrayList<>();
+    private TripData mAdaper, upcomingAdapter;
     LinearLayoutManager layoutManager;
+    LinearLayoutManager layoutManager2;
 
 
     @Override
@@ -84,9 +89,40 @@ public class YourTrips extends Fragment {
         my_trips.setItemAnimator(new DefaultItemAnimator());
         my_trips.setAdapter(mAdaper);
 
+        upcomingAdapter = new TripData(upcomingTripLst, getContext());
+        layoutManager2 = new LinearLayoutManager(getContext());
+        my_upcoming_trips.setLayoutManager(layoutManager2);
+        my_upcoming_trips.setItemAnimator(new DefaultItemAnimator());
+        my_upcoming_trips.setAdapter(upcomingAdapter);
+
+
         getData();
 
         return rootView;
+    }
+
+    /**
+     * Method for comparing a given date string to the current
+     * date time to check if the given date has already passed
+     * or not.
+     *
+     * @param date
+     * @return true or false if the date has passed or not
+     */
+    private boolean isOutdated(String date){
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date strDate = null;
+        try {
+            strDate = sdf.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return (new Date().after(strDate));
+
+
+
     }
 
     private void getData() {
@@ -94,12 +130,24 @@ public class YourTrips extends Fragment {
         String data = sharedPreferences.getString(getString(R.string.trips_array), "[]");
         Gson gson = new Gson();
         ArrayList<Trip> getAllTrips = gson.fromJson(data, new TypeToken<ArrayList<Trip>>(){}.getType());
-        tripList.addAll(getAllTrips);
+        for(int i = 0; i < getAllTrips.size(); i++){
+            System.out.println("checking trip: " + getAllTrips.get(i).getOrigin());
+            if(isOutdated(getAllTrips.get(i).getDate())){
+                tripList.add(getAllTrips.get(i));
+                mAdaper.notifyDataSetChanged();
+            }else{
+                upcomingTripLst.add(getAllTrips.get(i));
+                upcomingAdapter.notifyDataSetChanged();
+            }
+
+        }
+
+
         //System.out.println("Total trips: "+tripList.size());
         //System.out.println(tripList.toString());
         //System.out.println(tripList.get(0).getOrigin());
-        mAdaper.notifyDataSetChanged();
-        System.out.println("adapter has: " + mAdaper.getItemCount() + " objects");
+
+        //System.out.println("adapter has: " + mAdaper.getItemCount() + " objects");
 
     }
 
