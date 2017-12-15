@@ -30,7 +30,7 @@
                <ImageView
                    android:layout_width="match_parent"
                    android:layout_height="180dp"
-                   android:src="@drawable/bg_new_trip"
+                   android:src="@drawable/bg_new_trip_bd"
                    android:scaleType="fitXY"
                    />
 
@@ -351,7 +351,7 @@
                    android:id="@+id/common_expense"
                    android:layout_width="match_parent"
                    android:layout_height="wrap_content"
-                   android:hint="This amount will be spent from everyone"
+                   android:hint="Ex- tickets,hotel bills, transportations"
                    android:textSize="12sp"
                    android:layout_marginEnd="32dp"
                    android:inputType="number|numberDecimal"
