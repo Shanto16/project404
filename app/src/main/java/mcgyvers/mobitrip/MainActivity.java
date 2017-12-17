@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String MEMBERS = "members";
     public static final String TRIPID = "tripId";
     public static final String TRIPNAME = "tripName";
+    public static final String TRIP_EDIT = "tripedit"; // for editing trip
+    public static final String TRIP_EDIT_POS = "tripeditpos"; // for updating the edited trip on the main list of trips
 
     Toolbar mainToolbar;
     DrawerLayout drawerLayout;

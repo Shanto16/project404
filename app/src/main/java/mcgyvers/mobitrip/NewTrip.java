@@ -75,6 +75,9 @@ public class NewTrip extends Fragment {
     AtPlace desti = null;
 
 
+    Trip editTrip = null; // in case we're editing a trip
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
@@ -145,32 +148,67 @@ public class NewTrip extends Fragment {
         tmpShared = getActivity().getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
         if(tmpShared != null){
             Gson gson = new Gson();
-            String dest = tmpShared.getString(MainActivity.DESTINATION, "");
-            String origin = tmpShared.getString(MainActivity.ORIGIN,"");
-            String tripNm = tmpShared.getString(MainActivity.TRIPNAME, "");
-            String commonexp = tmpShared.getString(MainActivity.COMMONEXP, "");
-            String amnt = tmpShared.getString(MainActivity.AMOUNT, "");
+            if(tmpShared.getString(MainActivity.TRIP_EDIT, "") != ""){
+                // if we're editting something
+                String trip = tmpShared.getString(MainActivity.TRIP_EDIT, "");
+                editTrip = gson.fromJson(trip, Trip.class);
+                if(editTrip.getDestPlace() != null){
+                    desti = editTrip.getDestPlace();
+                    destination.setText(desti.getName() + ", " + desti.getAdress());
+                }
 
-            if(!dest.equals("")){
-                desti = gson.fromJson(dest, AtPlace.class);
-                destination.setText(desti.getName() + ", " + desti.getAdress());
-            }
+                if(editTrip.getOriginPlace() != null){
+                    or = editTrip.getOriginPlace();
+                    from.setText(or.getName() + ", " + or.getAdress());
+                }
 
-            if(!origin.equals("")){
-                or = gson.fromJson(origin, AtPlace.class);
-                from.setText(or.getName() + ", " + or.getAdress());
-            }
 
-            if (!tripNm.equals("")) {
-                tripName.setText(tripNm);
-            }
+                if(editTrip.getName() != "") tripName.setText(editTrip.getName());
+                if(editTrip.getCommonExp() != null) commonexpense.setText(String.valueOf(editTrip.getCommonExp()));
+                if(editTrip.getAmount() != null) amount.setText(String.valueOf(editTrip.getAmount()));
+                //TODO: fill the date fields
 
-            if(!commonexp.equals("")){
-                commonexpense.setText(commonexp);
-            }
 
-            if(!amnt.equals("")){
-                amount.setText(amnt);
+
+                tripName.setKeyListener(null);
+                commonexpense.setKeyListener(null);
+                amount.setKeyListener(null);
+                from.setKeyListener(null);
+                from.setClickable(false);
+                destination.setKeyListener(null);
+                destination.setClickable(false);
+
+
+
+            }else {
+
+                String dest = tmpShared.getString(MainActivity.DESTINATION, "");
+                String origin = tmpShared.getString(MainActivity.ORIGIN,"");
+                String tripNm = tmpShared.getString(MainActivity.TRIPNAME, "");
+                String commonexp = tmpShared.getString(MainActivity.COMMONEXP, "");
+                String amnt = tmpShared.getString(MainActivity.AMOUNT, "");
+
+                if(!dest.equals("")){
+                    desti = gson.fromJson(dest, AtPlace.class);
+                    destination.setText(desti.getName() + ", " + desti.getAdress());
+                }
+
+                if(!origin.equals("")){
+                    or = gson.fromJson(origin, AtPlace.class);
+                    from.setText(or.getName() + ", " + or.getAdress());
+                }
+
+                if (!tripNm.equals("")) {
+                    tripName.setText(tripNm);
+                }
+
+                if(!commonexp.equals("")){
+                    commonexpense.setText(commonexp);
+                }
+
+                if(!amnt.equals("")){
+                    amount.setText(amnt);
+                }
             }
         }
 
@@ -187,10 +225,13 @@ public class NewTrip extends Fragment {
         from.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveCurrentConfigs();
-                Intent i = new Intent(getActivity(), PlacePicker.class);
-                i.putExtra("way", "origin");
-                startActivity(i);
+                if(editTrip == null){
+                    saveCurrentConfigs();
+                    Intent i = new Intent(getActivity(), PlacePicker.class);
+                    i.putExtra("way", "origin");
+                    startActivity(i);
+                }
+
             }
         });
 
@@ -198,10 +239,12 @@ public class NewTrip extends Fragment {
         destination.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                saveCurrentConfigs();
-                Intent i = new Intent(getActivity(), PlacePicker.class);
-                i.putExtra("way", "destination");
-                startActivity(i);
+                if(editTrip == null){
+                    saveCurrentConfigs();
+                    Intent i = new Intent(getActivity(), PlacePicker.class);
+                    i.putExtra("way", "origin");
+                    startActivity(i);
+                }
             }
         });
 
@@ -371,5 +414,12 @@ public class NewTrip extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         saveCurrentConfigs();
+
+        if(editTrip != null){
+            tmpEditor = tmpShared.edit();
+            tmpEditor.clear();
+            tmpEditor.apply();
+
+        }
     }
 }

@@ -2,7 +2,9 @@ package mcgyvers.mobitrip.adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,12 +13,21 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import mcgyvers.mobitrip.CompletedTrip;
 import mcgyvers.mobitrip.Current_trip_member_information;
+import mcgyvers.mobitrip.MainActivity;
+import mcgyvers.mobitrip.NewTrip;
 import mcgyvers.mobitrip.R;
 import mcgyvers.mobitrip.User;
+import mcgyvers.mobitrip.dataModels.Member;
 import mcgyvers.mobitrip.dataModels.Trip;
 
 /**
@@ -71,8 +82,10 @@ public class TripData extends RecyclerView.Adapter<TripData.MyViewHolder> {
         holder.trip_bg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                context.startActivity(new Intent(context, CompletedTrip.class));
+                //context.startActivity(new Intent(context, CompletedTrip.class));
                 //context.startActivity(new Intent(context, Current_trip_member_information.class));
+                editTrip(pos, trip);
+
             }
         });
         //holder.trip_bg.setImageResource();//
@@ -135,5 +148,44 @@ public class TripData extends RecyclerView.Adapter<TripData.MyViewHolder> {
 
 
         }
+    }
+
+
+    /**
+     * EDITING TRIPS
+     *
+     * This method assings the clicked trip to the 'TRIP_EDIT' edit field of
+     * the TMP_PREFS local storage field for temporary assingment on NewTrip.class
+     * and brings the app to the NewTrip.class with the informations of the
+     * trip in question to be edited.
+     *
+     * @param pos position of the trip in the original list of trips
+     * @param trip Trip object to be edited
+     */
+    public void editTrip(int pos, Trip trip){
+
+        SharedPreferences tmpShared = this.context.getSharedPreferences(MainActivity.TMP_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor tmpEditor = tmpShared.edit();
+
+        Gson gson = new Gson();
+        try {
+            JSONObject editTrip = new JSONObject(gson.toJson(trip));
+            tmpEditor.putString(MainActivity.TRIP_EDIT, editTrip.toString());
+            tmpEditor.putInt(MainActivity.TRIP_EDIT_POS, pos);
+            String membersArray = gson.toJson(trip.getMembers(), new TypeToken<ArrayList<Member>>(){}.getType());
+            tmpEditor.putString(MainActivity.MEMBERS, membersArray);
+            tmpEditor.apply();
+
+            Intent intent = new Intent(context, MainActivity.class);
+            Bundle b = new Bundle();
+            b.putInt("fragToLoad", R.id.nav_new_trips);
+            intent.putExtras(b);
+            context.startActivity(intent);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
     }
 }

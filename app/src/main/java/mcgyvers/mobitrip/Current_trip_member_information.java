@@ -149,6 +149,13 @@ public class Current_trip_member_information extends AppCompatActivity implement
             }
         });
 
+
+        if(sharedPreferences.getString(MainActivity.TRIP_EDIT, "") != ""){
+            memberCard.setVisibility(View.GONE);
+            cancel.setVisibility(View.GONE);
+            save.setVisibility(View.GONE);
+        }
+
         setData();
 
 
