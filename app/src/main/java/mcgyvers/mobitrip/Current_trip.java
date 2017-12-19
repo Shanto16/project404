@@ -44,6 +44,7 @@ import com.google.gson.reflect.TypeToken;
 import com.timqi.sectorprogressview.ColorfulRingProgressView;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -99,8 +100,8 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         Typeface regular = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Regular.ttf");
         Typeface bold = Typeface.createFromAsset(getActivity().getAssets(), "fonts/Bold.ttf");
         Typeface firaSans_medium = Typeface.createFromAsset(getActivity().getAssets(),"fonts/FiraSans-Medium.ttf");
-        Typeface firaSans_semiBold = Typeface.createFromAsset(getActivity().getAssets(),"fonts/FiraSans-Medium.ttf");
-        Typeface amaranth = Typeface.createFromAsset(getActivity().getAssets(),"fonts/Amaranth-Bold.ttf");
+        final Typeface firaSans_semiBold = Typeface.createFromAsset(getActivity().getAssets(),"fonts/FiraSans-Medium.ttf");
+        final Typeface amaranth = Typeface.createFromAsset(getActivity().getAssets(),"fonts/Amaranth-Bold.ttf");
 
 
 
@@ -148,6 +149,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             }catch (Exception e){
                 e.printStackTrace();
                 Toast.makeText(getActivity(), "Location not found", Toast.LENGTH_SHORT).show();
+                currentLocation.setText("N/A");
             }
         }
 
@@ -273,10 +275,16 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
                 ListView myExpenseList = dialog.findViewById(R.id.my_expense_listView);
                 Button save_button = dialog.findViewById(R.id.my_expense_save);
+                TextView mytxt = dialog.findViewById(R.id.myExpense_txt);
+                mytxt.setTypeface(amaranth);
+                save_button.setTypeface(firaSans_semiBold);
+                save_button.setTransformationMethod(null);
 
                 TextView mText = dialog.findViewById(R.id.totalTEXT);
                 final TextView mTotal = dialog.findViewById(R.id.totalAMOUNT);
                 mText.setText("Total: ");
+                mText.setTypeface(firaSans_semiBold);
+                mTotal.setTypeface(firaSans_semiBold);
                 mTotal.setText(String.valueOf(currentTrip.getCommonExp()));
 
 
@@ -328,7 +336,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                     public void onClick(View view) {
 
                         mTotal.setText(String.valueOf(totalmExpenses));
-                        Expense expense = new Expense("", "0");
+                        Expense expense = new Expense("", "");
 
                         expenses.add(0, expense);
                         expensesAdapter.notifyDataSetChanged();
@@ -351,12 +359,22 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 // custom dialog
                 final Dialog dialog = new Dialog(context);
                 dialog.setContentView(R.layout.model_team_expense);
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.setTitle("Team Expense");
 
 
 
                 ListView team_expense = dialog.findViewById(R.id.team_expense_listview);
                 Button ok_button = dialog.findViewById(R.id.team_expense_dismiss);
+                TextView teamTXT = dialog.findViewById(R.id.teamExpense_txt);
+                TextView nameTXT = dialog.findViewById(R.id.expense_name_text);
+                TextView expenseTXT = dialog.findViewById(R.id.expense_expense_edit);
+
+                teamTXT.setTypeface(amaranth);
+                ok_button.setTransformationMethod(null);
+                ok_button.setTypeface(firaSans_semiBold);
+                nameTXT.setTypeface(firaSans_semiBold);
+                expenseTXT.setTypeface(firaSans_semiBold);
 
                 final ArrayList<Member> members = new ArrayList<>();
                 members.addAll(currentTrip.getMembers());

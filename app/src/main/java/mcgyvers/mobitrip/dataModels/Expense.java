@@ -1,5 +1,7 @@
 package mcgyvers.mobitrip.dataModels;
 
+import android.graphics.Typeface;
+
 /**
  * Created by edson on 26/11/17.
  *
