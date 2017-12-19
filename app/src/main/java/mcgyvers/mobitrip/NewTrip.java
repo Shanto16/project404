@@ -75,7 +75,7 @@ public class NewTrip extends Fragment {
     AtPlace desti = null;
 
 
-    Trip editTrip = null; // in case we're editing a trip
+    Trip editTrip = null; // in case we're editing a trip.
 
 
     @Override
