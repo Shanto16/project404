@@ -166,7 +166,7 @@ public class NewTrip extends Fragment {
                 if(editTrip.getName() != "") tripName.setText(editTrip.getName());
                 if(editTrip.getCommonExp() != null) commonexpense.setText(String.valueOf(editTrip.getCommonExp()));
                 if(editTrip.getAmount() != null) amount.setText(String.valueOf(editTrip.getAmount()));
-                //TODO: fill the date fields
+                //TODO: fill the date fields.
 
 
 
