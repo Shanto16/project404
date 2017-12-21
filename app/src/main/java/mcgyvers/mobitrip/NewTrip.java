@@ -242,7 +242,7 @@ public class NewTrip extends Fragment {
                 if(editTrip == null){
                     saveCurrentConfigs();
                     Intent i = new Intent(getActivity(), PlacePicker.class);
-                    i.putExtra("way", "origin");
+                    i.putExtra("way", "destination");
                     startActivity(i);
                 }
             }
