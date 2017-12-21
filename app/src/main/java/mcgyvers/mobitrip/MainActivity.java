@@ -1,6 +1,7 @@
 package mcgyvers.mobitrip;
 
 import android.app.Fragment;
+import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     FragmentTransaction fragmentTransaction;
     NavigationView navView;
     TextView tool_txt;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,9 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        Notifications notifications = new Notifications();
-        notifications.notify(getApplicationContext());
-
 
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -92,7 +91,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        Intent mServiceIntent = new Intent(getApplicationContext(), NotificationService.class);
+        mServiceIntent.putExtra("data", "data");
+        getApplicationContext().startService(mServiceIntent);
+
     }
+
+
 
 
     private void switchFragment(int n) {

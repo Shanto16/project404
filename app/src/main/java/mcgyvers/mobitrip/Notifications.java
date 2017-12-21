@@ -30,6 +30,10 @@ public class Notifications {
     }
 
     public void notify(Context context){
+        Intent resultIntent = new Intent(context,MainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+        //TODO:finish this pendingIntent
 
         notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -37,11 +41,12 @@ public class Notifications {
 
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(context, id)
-                    .setSmallIcon(R.drawable.cast_ic_notification_small_icon)
+                    .setSmallIcon(R.drawable.ic_end_trip)
                     .setContentTitle("Your trip is beggining shortly")
-                    .setContentText("Would you like to start your trip now");
+                    .setContentText("Would you like to start your trip now")
+                    .addAction(R.drawable.ic_current_trip, "Start Trip", pendingIntent);
 
-        Intent resultIntent = new Intent(context,MainActivity.class);
+
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addParentStack(MainActivity.class);
