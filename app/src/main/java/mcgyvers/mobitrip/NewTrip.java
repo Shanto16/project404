@@ -151,7 +151,9 @@ public class NewTrip extends Fragment {
             if(tmpShared.getString(MainActivity.TRIP_EDIT, "") != ""){
                 // if we're editting something
                 String trip = tmpShared.getString(MainActivity.TRIP_EDIT, "");
+                
                 editTrip = gson.fromJson(trip, Trip.class);
+                save.setText("Start Trip");
                 if(editTrip.getDestPlace() != null){
                     desti = editTrip.getDestPlace();
                     destination.setText(desti.getName() + ", " + desti.getAdress());
@@ -187,6 +189,8 @@ public class NewTrip extends Fragment {
                 String tripNm = tmpShared.getString(MainActivity.TRIPNAME, "");
                 String commonexp = tmpShared.getString(MainActivity.COMMONEXP, "");
                 String amnt = tmpShared.getString(MainActivity.AMOUNT, "");
+
+                save.setText("Save Trip");
 
                 if(!dest.equals("")){
                     desti = gson.fromJson(dest, AtPlace.class);
@@ -265,27 +269,58 @@ public class NewTrip extends Fragment {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO:check if amounts are numbers
-                String tdate = "";
-                String fr = "";
-                String dest = "";
+                if(editTrip != null){
+                    SharedPreferences currShared = getContext().getSharedPreferences(MainActivity.CURR_PREFS, Context.MODE_PRIVATE);
+                    SharedPreferences.Editor currEditor = currShared.edit();
 
-                fr = from.getText().toString();
-                tdate = trip_date.getText().toString();
-                dest = destination.getText().toString();
+                    // if there isnt any ongoing trip
+                    if(currShared.getString(MainActivity.CURR_TRIP,"") == ""){
+                        //now we're gonna start this goddamn trip
+                        // put the trip that's being edited here into the current trip local storage file
+                        String currTrip = tmpShared.getString(MainActivity.TRIP_EDIT, "");
+                        currEditor.putString(MainActivity.CURR_TRIP, currTrip);
+                        currEditor.apply();
 
-                if(tdate.equals("") || fr.equals("") || dest.equals("")){
-                    Toast.makeText(getContext(), "Locations and date fields must be filled", Toast.LENGTH_LONG).show();
+                        Intent intent = new Intent(context, MainActivity.class);
+                        Bundle b = new Bundle();
+                        b.putInt("fragToLoad", R.id.nav_current_trip);
+                        intent.putExtras(b);
+
+                        clearTmp();
+                        startActivity(intent);
+                    } else{
+                       //if there's already a trip ongoing
+                       Toast.makeText(getContext(), "There is already an ongoing trip", Toast.LENGTH_LONG).show();
+
+                    }
+
+
+
+
+
                 }else{
-                    createTrip(tdate, fr, dest ,Integer.parseInt(amount.getText().toString()),
-                            Integer.parseInt(commonexpense.getText().toString()), null);
+
+                    String tdate = "";
+                    String fr = "";
+                    String dest = "";
+
+                    fr = from.getText().toString();
+                    tdate = trip_date.getText().toString();
+                    dest = destination.getText().toString();
+
+                    if(tdate.equals("") || fr.equals("") || dest.equals("")){
+                        Toast.makeText(getContext(), "Locations and date fields must be filled", Toast.LENGTH_LONG).show();
+                    }else{
+                        createTrip(tdate, fr, dest ,Integer.parseInt(amount.getText().toString()),
+                                Integer.parseInt(commonexpense.getText().toString()), null);
+                    }
+
+                    clearTmp();
+
+
+
                 }
 
-
-
-                tmpEditor = tmpShared.edit();
-                tmpEditor.clear();
-                tmpEditor.apply();
 
             }
         });
@@ -294,9 +329,20 @@ public class NewTrip extends Fragment {
         return rootView;
     }
 
+    /**
+     * the temporary file must be cleared after we edit a trip
+     * as well as after we're creating a brand new one
+     */
+    void clearTmp(){
+        tmpEditor = tmpShared.edit();
+        tmpEditor.clear();
+        tmpEditor.apply();
+    }
+
 
     /**
      * saves current configurations of trip to the temporary trip file
+     * to not lose them when user changes context
      */
     void saveCurrentConfigs(){
 
@@ -308,6 +354,9 @@ public class NewTrip extends Fragment {
         tmpEditor.putString(MainActivity.COMMONEXP, commonexpense.getText().toString());
         tmpEditor.putString(MainActivity.TRIPDATE, trip_date.toString());
         tmpEditor.putString(MainActivity.TRIPNAME, tripName.getText().toString());
+
+
+
 
 
         tmpEditor.apply();
@@ -345,6 +394,7 @@ public class NewTrip extends Fragment {
 
         Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(tripId), null);
 
+        trip.isHost = true;
         // setting the name of the trip
         if(tripName.getText().toString() != ""){
             trip.setName(tripName.getText().toString());

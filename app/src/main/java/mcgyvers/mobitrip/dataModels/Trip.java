@@ -17,6 +17,7 @@ public class Trip {
     private Integer amount;
     private Integer commonExp;
     private String date;
+    public Boolean isHost;
     private boolean completed;
 
     private AtPlace destPlace;

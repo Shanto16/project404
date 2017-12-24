@@ -5,6 +5,7 @@ import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -28,9 +29,11 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final String CURR_PREFS = "mobi_trip_prefs_CURRENT";
+    public static final String TMP_PREFS = "mobi_trip_prefs_TEMP";
+    public static final String CURR_TRIP = "currentTrip";
     public static final String ORIGIN = "origin";
     public static final String DESTINATION = "destination";
-    public static final String TMP_PREFS = "mobi_trip_prefs_TEMP";
     public static final String AMOUNT = "amount";
     public static final String COMMONEXP = "commonExp";
     public static final String TRIPDATE = "tripdate";
@@ -39,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String TRIPNAME = "tripName";
     public static final String TRIP_EDIT = "tripedit"; // for editing trip
     public static final String TRIP_EDIT_POS = "tripeditpos"; // for updating the edited trip on the main list of trips
+    public static final String IS_HOST = "ishost"; // is the current user the owner of this trip?
 
     Toolbar mainToolbar;
     DrawerLayout drawerLayout;
@@ -74,10 +78,23 @@ public class MainActivity extends AppCompatActivity {
         tool_txt.setText("Current Trip");
         getSupportActionBar().setTitle("");
 
+
+
+
         Bundle b = getIntent().getExtras();
         if(b != null){ // if we are coming back from choosing a location in placePicker, open NewTrip and send bundle b with location params as argument
             switchFragment(b.getInt("fragToLoad"));
 
+        }else{
+            //if we dont have any ongoing trip, first load my trips list
+            SharedPreferences currShared = getApplicationContext().getSharedPreferences(CURR_PREFS, Context.MODE_PRIVATE);
+
+            if(currShared.getString(CURR_TRIP, "") == ""){
+                switchFragment(R.id.nav_your_trips);
+            }else{
+                //if we have an ongoing trip, load it
+                switchFragment(R.id.nav_current_trip);
+            }
         }
 
 

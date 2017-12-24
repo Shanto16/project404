@@ -83,6 +83,9 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
     final ArrayList<Expense> expenses = new ArrayList<>();
     final ExpensesAdapter expensesAdapter = new ExpensesAdapter(expenses, this);
 
+    // get a handle of the current trip local storage file
+
+
     private static final int MY_PERMISSION_REQUEST_LOCATION=1;
 
     Button team_expense, my_expense,hospitals,policeStation,maps,camera,restaurants,hotels,fuel,spots,finish;
@@ -197,6 +200,22 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         spent.setTypeface(amaranth);
 
 
+        finish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // for lack of a better something to do here
+                // we just clean the current trip file and
+                // bring the user back to the 'your trips' list
+                SharedPreferences currShared = getContext().getSharedPreferences(MainActivity.CURR_PREFS, Context.MODE_PRIVATE);
+                SharedPreferences.Editor currEditor = currShared.edit();
+                currEditor.clear();
+                currEditor.apply();
+                Toast.makeText(getContext(), "We should build a post trip page", Toast.LENGTH_LONG).show();
+                startActivity(new Intent(getContext(), MainActivity.class));
+
+            }
+        });
+
 
 
 
@@ -285,7 +304,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 mText.setText("Total: ");
                 mText.setTypeface(firaSans_semiBold);
                 mTotal.setTypeface(firaSans_semiBold);
-                mTotal.setText(String.valueOf(currentTrip.getCommonExp()));
+                mTotal.setText(String.valueOf(expensesAdapter.totalExp()));
 
 
 
@@ -299,7 +318,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
 
                 if(currentTrip.getExpenses() != null){
-                    expenses.addAll(currentTrip.getExpenses());
+                    if(expenses.isEmpty()) expenses.addAll(currentTrip.getExpenses());
                 }
 
 
@@ -373,7 +392,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 teamTXT.setTypeface(amaranth);
                 ok_button.setTransformationMethod(null);
                 ok_button.setTypeface(firaSans_semiBold);
-                nameTXT.setTypeface(firaSans_semiBold);
+               // nameTXT.setTypeface(firaSans_semiBold);
                 expenseTXT.setTypeface(firaSans_semiBold);
 
                 final ArrayList<Member> members = new ArrayList<>();
@@ -449,15 +468,23 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
      */
     public static Trip getCurrentTrip(Context context) {
 
+        SharedPreferences currPrefs = context.getSharedPreferences(MainActivity.CURR_PREFS, Context.MODE_PRIVATE);
+        String cur = currPrefs.getString(MainActivity.CURR_TRIP, "");
+
+        Gson gson = new Gson();
+        if(cur != ""){
+            return gson.fromJson(cur, Trip.class);
+        } else return null;
+
+
+        /*
         ArrayList<Trip> allTrips = getTripList(context);
 
         if(allTrips != null){
 
             return allTrips.get(allTrips.size() - 1);
         } else return null;
-
-
-
+        */
     }
 
     /**
