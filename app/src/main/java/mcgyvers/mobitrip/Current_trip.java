@@ -3,9 +3,13 @@ package mcgyvers.mobitrip;
 import android.*;
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -16,7 +20,12 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pManager;
+import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
+import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -24,12 +33,14 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -44,9 +55,13 @@ import com.google.gson.reflect.TypeToken;
 import com.timqi.sectorprogressview.ColorfulRingProgressView;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -55,9 +70,6 @@ import mcgyvers.mobitrip.dataModels.Expense;
 import mcgyvers.mobitrip.dataModels.Member;
 import mcgyvers.mobitrip.dataModels.Trip;
 
-import static mcgyvers.mobitrip.R.id.all;
-import static mcgyvers.mobitrip.R.id.place_autocomplete_prediction_primary_text;
-import static mcgyvers.mobitrip.R.id.toolbar;
 
 /**
  * Created by Shanto on 9/7/2017.
@@ -78,6 +90,17 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
     int currentPos = 0;
     int totalmExpenses = 0;
 
+    //-----------wifi p2p----------//
+    WifiP2pManager manager;
+    WifiP2pManager.Channel channel;
+    BroadcastReceiver receiver;
+    IntentFilter mIntentFilter;
+    PeerListListener peerListListener;
+    ArrayAdapter<String> peersNames;
+
+    AlertDialog.Builder builder;
+    AlertDialog peersDialog;
+    //-----------------------------//
 
     // adapter for handling expenses
     final ArrayList<Expense> expenses = new ArrayList<>();
@@ -231,9 +254,11 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         policeStation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), MapsActivity.class);
-                intent.putExtra("POI", "Police");
-                startActivity(intent);
+                //Intent intent = new Intent(getContext(), MapsActivity.class);
+                //intent.putExtra("POI", "Police");
+                //startActivity(intent);
+
+                discoverPs(channel);
             }
         });
 
@@ -365,7 +390,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                     }
                 });
 
-
                 dialog.show();
 
             }
@@ -393,12 +417,14 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 ok_button.setTransformationMethod(null);
                 ok_button.setTypeface(firaSans_semiBold);
                // nameTXT.setTypeface(firaSans_semiBold);
-                expenseTXT.setTypeface(firaSans_semiBold);
+//                expenseTXT.setTypeface(firaSans_semiBold);
 
                 final ArrayList<Member> members = new ArrayList<>();
                 members.addAll(currentTrip.getMembers());
                 final MemberExpAdapter memberExpAdapter = new MemberExpAdapter(members);
                 team_expense.setAdapter(memberExpAdapter);
+
+
 
                 ok_button.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -410,6 +436,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                         UpdateTripList(getContext(),currentTrip, currentPos);
 
                         dialog.dismiss();
+
                     }
                 });
 
@@ -433,8 +460,98 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
         currentTrip = getCurrentTrip(getContext());
 
+        setupWifip2p();
+        discoverPs(channel);
+
+
+
+
 
         return rootView;
+    }
+
+    /**
+     * initializes the components of the wifi p2p and sets up the broadcast receiver actions
+     * as well as the dialog in which the peers are gonna be shown
+     */
+    private void setupWifip2p() {
+
+        manager = (WifiP2pManager) getContext().getSystemService(Context.WIFI_P2P_SERVICE);
+        channel = manager.initialize(getContext(), Looper.getMainLooper(), null);
+        receiver = new WiFiDirectBroadcastReceiver(manager, channel, this, peerListListener);
+
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
+
+
+        peersNames = new ArrayAdapter<String>(getContext(), android.R.layout.simple_selectable_list_item);
+
+
+
+        builder = new AlertDialog.Builder(getContext());
+
+        builder.setTitle("Select Peers")
+                .setAdapter(peersNames, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        peersDialog.dismiss();
+                    }
+                });
+
+    }
+
+    private void discoverPs(WifiP2pManager.Channel channel){
+
+        if(manager != null){
+            manager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+
+
+                }
+
+                @Override
+                public void onFailure(int reason) {
+                    Toast.makeText(getContext(), "didnt find shit, sorry", Toast.LENGTH_LONG).show();
+
+                }
+            });
+        }else{
+            Toast.makeText(getContext(), "manager is null", Toast.LENGTH_LONG).show();
+        }
+
+
+
+
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onDevicesReceived(OnReceiverDevicesEvent event){
+        peersDialog = builder.create();
+        peersDialog.show();
+        Log.d("P2P", "Found something on events!");
+        Toast.makeText(getContext(), "Found something", Toast.LENGTH_LONG).show();
+        Collection<WifiP2pDevice> devs = event.getDevices().getDeviceList();
+        ArrayList<WifiP2pDevice> devsList = new ArrayList<>(devs);
+
+
+        for(int i = 0; i < devsList.size(); i++){
+            Log.d("P2P", "Device Found: " + devsList.get(0).deviceName);
+            peersNames.add(devsList.get(i).deviceName);
+            peersNames.notifyDataSetChanged();
+        }
+
+
     }
 
     /**
@@ -827,6 +944,24 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        //making this activity a subscriber of the wifi broadcast receiver
+        EventBus.getDefault().register(this);
+        if(receiver != null && mIntentFilter != null){
+            getContext().registerReceiver(receiver, mIntentFilter);
+        }
 
+    }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        // unsubscribing
+        EventBus.getDefault().unregister(this);
+        if(receiver != null && mIntentFilter != null){
+            getContext().unregisterReceiver(receiver);
+        }
+    }
 }
