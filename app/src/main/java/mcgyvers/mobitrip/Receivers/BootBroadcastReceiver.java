@@ -1,4 +1,4 @@
-package mcgyvers.mobitrip;
+package mcgyvers.mobitrip.Receivers;
 
 import android.content.Context;
 import android.content.Intent;

@@ -1,8 +1,6 @@
 package mcgyvers.mobitrip;
 
-import android.*;
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -15,13 +13,14 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.wifi.WpsInfo;
+import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
@@ -29,7 +28,6 @@ import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -46,7 +44,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,17 +51,19 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.timqi.sectorprogressview.ColorfulRingProgressView;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-import org.w3c.dom.Text;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+import mcgyvers.mobitrip.Receivers.OnReceiverDevicesEvent;
+import mcgyvers.mobitrip.Receivers.OnReceiverNetInfoEvent;
+import mcgyvers.mobitrip.Receivers.WiFiDirectBroadcastReceiver;
 import mcgyvers.mobitrip.adapters.MemberData;
 import mcgyvers.mobitrip.dataModels.Expense;
 import mcgyvers.mobitrip.dataModels.Member;
@@ -97,9 +96,11 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
     IntentFilter mIntentFilter;
     PeerListListener peerListListener;
     ArrayAdapter<String> peersNames;
+    DevicesListAdapter devicesListAdapter;
 
     AlertDialog.Builder builder;
     AlertDialog peersDialog;
+    ArrayList<WifiP2pDevice> devsList = new ArrayList<>();
     //-----------------------------//
 
     // adapter for handling expenses
@@ -259,6 +260,8 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 //startActivity(intent);
 
                 discoverPs(channel);
+                peersDialog = builder.create();
+                peersDialog.show();
             }
         });
 
@@ -489,13 +492,19 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
 
         peersNames = new ArrayAdapter<String>(getContext(), android.R.layout.simple_selectable_list_item);
+        devicesListAdapter = new DevicesListAdapter(devsList, getContext(), new MemberData.onItemClickListener() {
+            @Override
+            public void callback(int pos) {
+                connect(devsList.get(pos));
+            }
+        });
 
 
 
         builder = new AlertDialog.Builder(getContext());
 
         builder.setTitle("Select Peers")
-                .setAdapter(peersNames, new DialogInterface.OnClickListener() {
+                .setAdapter(devicesListAdapter, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //
@@ -536,21 +545,85 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNetworkInfoReceived(OnReceiverNetInfoEvent event){
+
+        WifiP2pInfo info = event.getInfo();
+
+        // InetAddress from WifiP2pInfo struc.
+        String groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
+
+        // After the group negotiation, we can determine the group owner
+        // (server).
+        if(info.groupFormed && info.isGroupOwner){
+            Toast.makeText(getContext(), "Group formed. Host", Toast.LENGTH_SHORT).show();
+            if(peersDialog.isShowing())peersDialog.dismiss();
+
+            // Do whatever tasks are specific to the group owner.
+            // One common case is creating a group owner thread and accepting
+            // incoming connections.
+        } else if(info.groupFormed){
+            Toast.makeText(getContext(), "Connected as Peer", Toast.LENGTH_SHORT).show();
+            if(peersDialog.isShowing())peersDialog.dismiss();
+            // The other device acts as the peer (client). In this case,
+            // you'll want to create a peer thread that connects
+            // to the group owner.
+        }
+
+    }
+
+    /**
+     * on the onDevicesReceived the app handles the "device discovered" event triggered by the
+     * WiFiDirectBroadcastReceiver(PubSub).
+     * @param event device discovered event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDevicesReceived(OnReceiverDevicesEvent event){
-        peersDialog = builder.create();
-        peersDialog.show();
+        //if(!devicesListAdapter.isEmpty()) devicesListAdapter.clear(); // clear old names
+
+
+        devicesListAdapter.removeAll();
         Log.d("P2P", "Found something on events!");
-        Toast.makeText(getContext(), "Found something", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getContext(), "Found something", Toast.LENGTH_LONG).show();
         Collection<WifiP2pDevice> devs = event.getDevices().getDeviceList();
-        ArrayList<WifiP2pDevice> devsList = new ArrayList<>(devs);
+        devsList.addAll(devs);
+
 
 
         for(int i = 0; i < devsList.size(); i++){
-            Log.d("P2P", "Device Found: " + devsList.get(0).deviceName);
-            peersNames.add(devsList.get(i).deviceName);
-            peersNames.notifyDataSetChanged();
+
+            if(!devicesListAdapter.hasItem(devsList.get(i))){
+                Log.d("P2P", "Device Found: " + devsList.get(0).deviceName);
+                devicesListAdapter.add(devsList.get(i).deviceName);
+                devicesListAdapter.notifyDataSetChanged();
+            }
+
         }
 
+
+    }
+
+    /**
+     * Connects to a selected p2p device
+     * @param device to be connected to
+     */
+    public void connect(WifiP2pDevice device){
+        WifiP2pConfig config = new WifiP2pConfig();
+        config.deviceAddress = device.deviceAddress;
+        config.wps.setup = WpsInfo.PBC;
+
+        manager.connect(channel, config, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Toast.makeText(getContext(), "Connect failed. Retry.",
+                        Toast.LENGTH_SHORT).show();
+
+            }
+        });
 
     }
 
@@ -593,15 +666,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             return gson.fromJson(cur, Trip.class);
         } else return null;
 
-
-        /*
-        ArrayList<Trip> allTrips = getTripList(context);
-
-        if(allTrips != null){
-
-            return allTrips.get(allTrips.size() - 1);
-        } else return null;
-        */
     }
 
     /**
@@ -943,6 +1007,74 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
         }
     }
+
+    /**
+     * adapter for the devices list. A custom adapter had to be made
+     * so we can have a click listener interface with the the main thread
+     * so we can perform peer connection
+     */
+    class DevicesListAdapter extends ArrayAdapter<String>{
+
+        ArrayList<WifiP2pDevice> devslist;
+        private final MemberData.onItemClickListener listener;
+
+        DevicesListAdapter(ArrayList<WifiP2pDevice> list, Context context, MemberData.onItemClickListener listener){
+            super(context, R.layout.my_expense_model);
+            this.devslist = list;
+            this.listener = listener;
+        }
+
+
+
+        @Override
+        public int getCount() {
+            return devslist.size();
+        }
+
+        public View getView(final int position, View convertView, ViewGroup parent) {
+            View row;
+
+            if(convertView == null){
+                LayoutInflater inflater = getLayoutInflater();
+                row = inflater.inflate(R.layout.my_expense_model, parent, false);
+            } else {
+                row = convertView;
+            }
+
+            TextView tv = row.findViewById(R.id.usedON);
+            TextView cnt = row.findViewById(R.id.cost);
+            ImageView rmv = row.findViewById(R.id.remove_item_expense);
+
+            cnt.setVisibility(View.GONE);
+
+
+            tv.setText(devslist.get(position).deviceName);
+            rmv.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.callback(position);
+
+                }
+            });
+
+            return row;
+        }
+
+        public boolean hasItem(WifiP2pDevice dev){
+            for(int i = devslist.size(); i < 0; i--){
+                if(dev.deviceName == devslist.get(i).deviceName) return true;
+            }
+
+            return false;
+        }
+
+        public void removeAll(){
+            devslist.clear();
+        }
+
+    }
+
+
 
     @Override
     public void onResume() {
