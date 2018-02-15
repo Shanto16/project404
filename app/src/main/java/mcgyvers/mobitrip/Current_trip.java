@@ -413,8 +413,8 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 ListView team_expense = dialog.findViewById(R.id.team_expense_listview);
                 Button ok_button = dialog.findViewById(R.id.team_expense_dismiss);
                 TextView teamTXT = dialog.findViewById(R.id.teamExpense_txt);
-                TextView nameTXT = dialog.findViewById(R.id.expense_name_text);
-                TextView expenseTXT = dialog.findViewById(R.id.expense_expense_edit);
+                TextView nameTXT = dialog.findViewById(R.id.team_name);
+                TextView expenseTXT = dialog.findViewById(R.id.team_expense);
 
                 teamTXT.setTypeface(amaranth);
                 ok_button.setTransformationMethod(null);
