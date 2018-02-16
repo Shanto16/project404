@@ -109,7 +109,7 @@ public class YourTrips extends Fragment {
      * @param date
      * @return true or false if the date has passed or not
      */
-    private boolean isOutdated(String date){
+    public static boolean isOutdated(String date){
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Date strDate = null;
@@ -121,6 +121,32 @@ public class YourTrips extends Fragment {
 
         return (new Date().after(strDate));
 
+
+
+    }
+
+    /**
+     * Method for retrieving the upcoming trips currently in store
+     * it takes the context as parameter
+     * @param context
+     * @return array list with upcoming trip objects
+     */
+    public static ArrayList<Trip> getUpcomingTrips(Context context){
+
+        ArrayList<Trip> upcoming = new ArrayList<>();
+        SharedPreferences sharedPreferences = context.getSharedPreferences("mobi_trip_prefs", Context.MODE_PRIVATE);
+        String data = sharedPreferences.getString("tarray", "[]");
+        Gson gson = new Gson();
+        ArrayList<Trip> getAllTrips = gson.fromJson(data, new TypeToken<ArrayList<Trip>>(){}.getType());
+        for(int i = 0; i < getAllTrips.size(); i++){
+            System.out.println("checking trip: " + getAllTrips.get(i).getOrigin());
+            if(!isOutdated(getAllTrips.get(i).getDate())){
+                upcoming.add(getAllTrips.get(i));
+            }
+
+        }
+
+        return upcoming;
 
 
     }

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,13 +18,16 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -55,7 +59,17 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -101,6 +115,10 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
     AlertDialog.Builder builder;
     AlertDialog peersDialog;
     ArrayList<WifiP2pDevice> devsList = new ArrayList<>();
+    Boolean server_running = false;
+
+    String port = "8888";
+    String groupOwnerAddress = "";
     //-----------------------------//
 
     // adapter for handling expenses
@@ -223,6 +241,9 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         _expense.setTypeface(amaranth);
         spent.setTypeface(amaranth);
 
+        setPercentage();
+
+        //expenseProgress.setPercent();
 
         finish.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -301,12 +322,12 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             }
         });
 
-
+        /*
         expenseProgress.setPercent(pcnt);
         _expense.setText(Float.toString(pcnt)+"%");
         animated_progress_show.setPercent(pcnt);
         animated_progress_show.animateIndeterminate(2500,null);
-
+        */
 
         my_expense.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -345,8 +366,10 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
 
 
-                if(currentTrip.getExpenses() != null){
+                if(currentTrip != null &&  currentTrip.getExpenses() != null){
                     if(expenses.isEmpty()) expenses.addAll(currentTrip.getExpenses());
+                } else{
+                    Toast.makeText(getContext(), "This trip has no expenses", Toast.LENGTH_SHORT).show();
                 }
 
 
@@ -355,21 +378,23 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 save_button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        currentPos = getCurrentPos(getContext());
-                        if(currentPos > -1){
+                        if(currentTrip != null){
+                            currentPos = getCurrentPos(getContext());
+                            if(currentPos > -1){
 
-                            // removing the blank objects
-                            for(int i = expenses.size()-1; i >= 0; i--){
-                                if(expenses.get(i).getName().equals("") || expenses.get(i).getCost().equals("")){
-                                    expenses.remove(i);
+                                // removing the blank objects
+                                for(int i = expenses.size()-1; i >= 0; i--){
+                                    if(expenses.get(i).getName().equals("") || expenses.get(i).getCost().equals("")){
+                                        expenses.remove(i);
+                                    }
                                 }
-                            }
 
-                            expensesAdapter.notifyDataSetChanged();
-                            currentTrip.setExpenses(expenses);
-                            UpdateTripList(getContext(),currentTrip, currentPos);
-                        }else{
-                            Toast.makeText(getContext(), "Error adding expenses", Toast.LENGTH_LONG).show();
+                                expensesAdapter.notifyDataSetChanged();
+                                currentTrip.setExpenses(expenses);
+                                UpdateTripList(getContext(),currentTrip, currentPos);
+                            }else{
+                                Toast.makeText(getContext(), "Error adding expenses", Toast.LENGTH_LONG).show();
+                            }
                         }
 
                         dialog.dismiss();
@@ -423,7 +448,10 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 //                expenseTXT.setTypeface(firaSans_semiBold);
 
                 final ArrayList<Member> members = new ArrayList<>();
-                members.addAll(currentTrip.getMembers());
+                if(currentTrip != null && currentTrip.getMembers() != null){
+                    members.addAll(currentTrip.getMembers());
+                } else Toast.makeText(getContext(), "This trip has no members", Toast.LENGTH_SHORT).show();
+
                 final MemberExpAdapter memberExpAdapter = new MemberExpAdapter(members);
                 team_expense.setAdapter(memberExpAdapter);
 
@@ -432,11 +460,13 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 ok_button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        if(currentTrip != null){
+                            currentPos = getCurrentPos(getContext());
+                            memberExpAdapter.notifyDataSetChanged();
+                            currentTrip.setMembers(members);
+                            UpdateTripList(getContext(),currentTrip, currentPos);
+                        }
 
-                        currentPos = getCurrentPos(getContext());
-                        memberExpAdapter.notifyDataSetChanged();
-                        currentTrip.setMembers(members);
-                        UpdateTripList(getContext(),currentTrip, currentPos);
 
                         dialog.dismiss();
 
@@ -471,6 +501,20 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
 
         return rootView;
+    }
+
+    private void setPercentage() {
+        float exp = 0;
+
+        if(currentTrip != null){
+            exp =  (float) currentTrip.getAmount() / currentTrip.getCommonExp();
+        }
+
+        expenseProgress.setPercent(exp);
+        _expense.setText(Float.toString(exp)+"%");
+        animated_progress_show.setPercent(exp);
+        animated_progress_show.animateIndeterminate(2500,null);
+
     }
 
     /**
@@ -544,13 +588,20 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
     }
 
+    /**
+     * Handles the client-server data thread and
+     * group negotiation once the peers are connected
+     * @param event
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onNetworkInfoReceived(OnReceiverNetInfoEvent event){
 
         WifiP2pInfo info = event.getInfo();
 
         // InetAddress from WifiP2pInfo struc.
-        String groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
+        groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
+        // String port = "8888";
+
 
         // After the group negotiation, we can determine the group owner
         // (server).
@@ -559,20 +610,25 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             if(peersDialog.isShowing())peersDialog.dismiss();
 
             // Do whatever tasks are specific to the group owner.
+            String data = "";
+            new DataServerAsyncTask().execute(data, port);
+
+
             // One common case is creating a group owner thread and accepting
             // incoming connections.
         } else if(info.groupFormed){
             Toast.makeText(getContext(), "Connected as Peer", Toast.LENGTH_SHORT).show();
             if(peersDialog.isShowing())peersDialog.dismiss();
-            // The other device acts as the peer (client). In this case,
-            // you'll want to create a peer thread that connects
-            // to the group owner.
+            // The other acts as the peer (client).
+            String data = "";
+            sendData(groupOwnerAddress, Integer.parseInt(port), data);
+
         }
 
     }
 
     /**
-     * on the onDevicesReceived the app handles the "device discovered" event triggered by the
+     * the app handles the "device discovered" event triggered by the
      * WiFiDirectBroadcastReceiver(PubSub).
      * @param event device discovered event
      */
@@ -606,6 +662,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
      * Connects to a selected p2p device
      * @param device to be connected to
      */
+
     public void connect(WifiP2pDevice device){
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device.deviceAddress;
@@ -617,10 +674,20 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
             }
 
+
             @Override
             public void onFailure(int reason) {
-                Toast.makeText(getContext(), "Connect failed. Retry.",
-                        Toast.LENGTH_SHORT).show();
+
+                if(reason == WifiP2pManager.P2P_UNSUPPORTED){
+                    Toast.makeText(getContext(), "P2P isn't supported on this device.",
+                            Toast.LENGTH_SHORT).show();
+
+                } else{
+                    Toast.makeText(getContext(), "Connect failed. Retry.",
+                            Toast.LENGTH_SHORT).show();
+                }
+
+
 
             }
         });
@@ -652,6 +719,8 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
      * It fetches the array list of all the trips on the device, and returns only
      * the first element on the list, if it exists. It also updates currentPos int
      * variable with the position of the current trip in the list
+     *
+     * Update(Feb/2018): it fetches only trips under the CURR_TRIP tag, no longer from the list of trips
      *
      * @param context current activity context
      * @return Trip object
@@ -920,6 +989,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
             totalmExpenses = totalExp();
             currentTrip.setCommonExp(totalmExpenses);
+            setPercentage();
 
             View view = convertView;
             if(view == null){
@@ -1019,7 +1089,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         private final MemberData.onItemClickListener listener;
 
         DevicesListAdapter(ArrayList<WifiP2pDevice> list, Context context, MemberData.onItemClickListener listener){
-            super(context, R.layout.my_expense_model);
+            super(context, R.layout.get_expense_model);
             this.devslist = list;
             this.listener = listener;
         }
@@ -1036,20 +1106,24 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
             if(convertView == null){
                 LayoutInflater inflater = getLayoutInflater();
-                row = inflater.inflate(R.layout.my_expense_model, parent, false);
+                row = inflater.inflate(R.layout.get_expense_model, parent, false);
             } else {
                 row = convertView;
             }
 
-            TextView tv = row.findViewById(R.id.usedON);
-            TextView cnt = row.findViewById(R.id.cost);
-            ImageView rmv = row.findViewById(R.id.remove_item_expense);
+            TextView dev = row.findViewById(R.id.device_name);
+            TextView mc = row.findViewById(R.id.device_mac);
+            Button gt = row.findViewById(R.id.get_expense_bt);
+            gt.setText("Invite");
 
-            cnt.setVisibility(View.GONE);
 
 
-            tv.setText(devslist.get(position).deviceName);
-            rmv.setOnClickListener(new View.OnClickListener() {
+
+
+
+            dev.setText(devslist.get(position).deviceName);
+            mc.setText(devslist.get(position).deviceAddress);
+            gt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     listener.callback(position);
@@ -1096,4 +1170,111 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             getContext().unregisterReceiver(receiver);
         }
     }
+
+
+
+    /**
+     * client method to send data to other devices or groupOwner
+     * through p2p data thread
+     *
+     * @param host host address
+     * @param port port in which to connect
+     * @param data String (usually gson) to be sent through the data stream
+     */
+    public static void sendData(String host, int port,  String data) {
+
+        Socket socket = new Socket();
+
+        try {
+            /**
+             * Create a client socket with the host,
+             * port, and timeout information.
+             */
+            socket.bind(null);
+            socket.connect((new InetSocketAddress(host, port)), 500);
+
+            /**
+             * Create a byte stream from a JPEG file and pipe it to the output stream
+             * of the socket. This data will be retrieved by the server device.
+             */
+
+            OutputStream outputStream = socket.getOutputStream();
+            outputStream.write(data.getBytes());
+
+
+        } catch (FileNotFoundException e) {
+            //catch logic
+        } catch (IOException e) {
+            //catch logic
+        }
+
+        /**
+         * Clean up any open sockets when done
+         * transferring or if an exception occurred.
+         */
+        finally {
+            if (socket != null) {
+                if (socket.isConnected()) {
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        //catch logic
+                    }
+                }
+            }
+        }
+
+    }
+
+    public  class DataServerAsyncTask extends AsyncTask<String, Void, String> {
+
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+
+                /*
+                 * Create a server socket and wait for client connections. This
+                 * call blocks until a connection is accepted from a client
+                 */
+                int port = Integer.parseInt(strings[1]);
+                ServerSocket serverSocket = new ServerSocket(port);
+                Socket client = serverSocket.accept();
+
+                /*
+                 * If this code is reached, a client has connected
+                 * the group owner sends and invitation to the trip
+                 * or requests expenses data
+                 */
+
+
+                DataOutputStream mDataOutputStream = new DataOutputStream(client.getOutputStream());
+                mDataOutputStream.writeUTF(strings[0]);
+                mDataOutputStream.flush();
+                serverSocket.close();
+                server_running = false;
+
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            return null;
+        }
+
+        /**
+         * Do something...
+         */
+        @Override
+        protected void onPostExecute(String result) {
+
+        }
+    }
+
+
 }
+
+
+

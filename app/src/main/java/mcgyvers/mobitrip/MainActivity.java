@@ -8,11 +8,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.icu.text.SimpleDateFormat;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -26,6 +29,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Calendar;
+
+import mcgyvers.mobitrip.dataModels.Trip;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -51,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
     NavigationView navView;
     TextView tool_txt;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,14 +120,49 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        notifyForTrips();
 
-        Intent mServiceIntent = new Intent(getApplicationContext(), NotificationService.class);
-        mServiceIntent.putExtra("data", "data");
-        getApplicationContext().startService(mServiceIntent);
+
+
 
     }
 
+    /**
+     * Sends notification to user if there are upcoming trips
+     * that start within a day or less
+     */
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void notifyForTrips() {
+        ArrayList<Trip> upcoming = null;
+        upcoming = YourTrips.getUpcomingTrips(getApplicationContext());
 
+        for(int i = 0; i < upcoming.size(); i++){
+
+            String inputDateString = upcoming.get(i).getDate();
+            Calendar calCurr = Calendar.getInstance();
+            Calendar day = Calendar.getInstance();
+            try {
+                day.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(inputDateString));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if(day.after(calCurr)){
+                int daysAfter = (day.get(Calendar.DAY_OF_MONTH) -(calCurr.get(Calendar.DAY_OF_MONTH)));
+                if(daysAfter < 2){
+
+                    Intent mServiceIntent = new Intent(getApplicationContext(), NotificationService.class);
+                    mServiceIntent.putExtra("trip", new Gson().toJson(upcoming.get(i)));
+                    getApplicationContext().startService(mServiceIntent);
+
+                }
+            }
+
+        }
+
+
+
+
+    }
 
 
     private void switchFragment(int n) {

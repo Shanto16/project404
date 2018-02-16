@@ -11,6 +11,8 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
+import mcgyvers.mobitrip.dataModels.Trip;
+
 /**
  * Created by edson on 14/12/17.
  *
@@ -29,7 +31,7 @@ public class Notifications {
 
     }
 
-    public void notify(Context context){
+    public void notify(Context context, Trip trip){
         Intent resultIntent = new Intent(context,MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, resultIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
@@ -43,7 +45,7 @@ public class Notifications {
                 new NotificationCompat.Builder(context, id)
                     .setSmallIcon(R.drawable.ic_end_trip)
                     .setContentTitle("Your trip is beggining shortly")
-                    .setContentText("Would you like to start your trip now")
+                    .setContentText(trip.getOrigin() + " - " + trip.getDestination() + "\n" + trip.getDate())
                     .addAction(R.drawable.ic_current_trip, "Start Trip", pendingIntent);
 
 
