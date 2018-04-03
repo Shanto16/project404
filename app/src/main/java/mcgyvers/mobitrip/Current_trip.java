@@ -1,6 +1,7 @@
 package mcgyvers.mobitrip;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
@@ -28,9 +29,12 @@ import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -82,6 +86,7 @@ import mcgyvers.mobitrip.adapters.MemberData;
 import mcgyvers.mobitrip.dataModels.Expense;
 import mcgyvers.mobitrip.dataModels.Member;
 import mcgyvers.mobitrip.dataModels.Trip;
+import mcgyvers.mobitrip.interfaces.P2pConstants;
 
 
 /**
@@ -119,6 +124,9 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
     String port = "8888";
     String groupOwnerAddress = "";
+
+    ArrayList<Wifip2pService> connectionThreads = new ArrayList<>();
+    ArrayList<String> devicesConnected = new ArrayList<>();
     //-----------------------------//
 
     // adapter for handling expenses
@@ -216,11 +224,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
 
 
-
-
-
-
-
         hospitals.setTypeface(firaSans_semiBold);
         policeStation.setTypeface(firaSans_semiBold);
         maps.setTypeface(firaSans_semiBold);
@@ -243,7 +246,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
         setPercentage();
 
-        //expenseProgress.setPercent();
 
         finish.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -322,13 +324,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             }
         });
 
-        /*
-        expenseProgress.setPercent(pcnt);
-        _expense.setText(Float.toString(pcnt)+"%");
-        animated_progress_show.setPercent(pcnt);
-        animated_progress_show.animateIndeterminate(2500,null);
-        */
-
         my_expense.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -359,11 +354,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
                 myExpenseList.setAdapter(expensesAdapter);
                 expensesAdapter.notifyDataSetChanged();
-
-
-
-
-
 
 
                 if(currentTrip != null &&  currentTrip.getExpenses() != null){
@@ -588,44 +578,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
     }
 
-    /**
-     * Handles the client-server data thread and
-     * group negotiation once the peers are connected
-     * @param event
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNetworkInfoReceived(OnReceiverNetInfoEvent event){
 
-        WifiP2pInfo info = event.getInfo();
-
-        // InetAddress from WifiP2pInfo struc.
-        groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
-        // String port = "8888";
-
-
-        // After the group negotiation, we can determine the group owner
-        // (server).
-        if(info.groupFormed && info.isGroupOwner){
-            Toast.makeText(getContext(), "Group formed. Host", Toast.LENGTH_SHORT).show();
-            if(peersDialog.isShowing())peersDialog.dismiss();
-
-            // Do whatever tasks are specific to the group owner.
-            String data = "";
-            new DataServerAsyncTask().execute(data, port);
-
-
-            // One common case is creating a group owner thread and accepting
-            // incoming connections.
-        } else if(info.groupFormed){
-            Toast.makeText(getContext(), "Connected as Peer", Toast.LENGTH_SHORT).show();
-            if(peersDialog.isShowing())peersDialog.dismiss();
-            // The other acts as the peer (client).
-            String data = "";
-            sendData(groupOwnerAddress, Integer.parseInt(port), data);
-
-        }
-
-    }
 
     /**
      * the app handles the "device discovered" event triggered by the
@@ -659,11 +612,54 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
     }
 
     /**
+     * Handles the client-server data thread and
+     * group negotiation once the peers are connected
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNetworkInfoReceived(OnReceiverNetInfoEvent event){
+
+        WifiP2pInfo info = event.getInfo();
+
+        // InetAddress from WifiP2pInfo struc.
+        groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
+        // String port = "8888";
+
+
+        // After the group negotiation, we can determine the group owner
+        // (server).
+        if(info.groupFormed && info.isGroupOwner){
+            Toast.makeText(getContext(), "Group formed. Host", Toast.LENGTH_SHORT).show();
+            if(peersDialog.isShowing())peersDialog.dismiss();
+
+            // starting a data thread with the latest connected device
+            Wifip2pService mService = new Wifip2pService(getContext(), mHandler,port, true, groupOwnerAddress);
+            // assign the name of the latest connect device to this thread so we keep track
+            mService.deviceName = devicesConnected.get(devicesConnected.size() - 1);
+            connectionThreads.add(mService);
+
+
+            // One common case is creating a group owner thread and accepting
+            // incoming connections.
+        } else if(info.groupFormed){
+            Toast.makeText(getContext(), "Connected as Peer", Toast.LENGTH_SHORT).show();
+            if(peersDialog.isShowing())peersDialog.dismiss();
+
+            // starting a data thread with the owner
+            Wifip2pService mService = new Wifip2pService(getContext(), mHandler, port, false, groupOwnerAddress);
+            mService.deviceName = devicesConnected.get(devicesConnected.size() - 1);
+            connectionThreads.add(mService);
+
+        }
+
+    }
+
+    /**
      * Connects to a selected p2p device
      * @param device to be connected to
      */
 
-    public void connect(WifiP2pDevice device){
+    public void connect(final WifiP2pDevice device){
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device.deviceAddress;
         config.wps.setup = WpsInfo.PBC;
@@ -671,6 +667,8 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         manager.connect(channel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
+                // keep the name of the latest device connected to keep track
+                devicesConnected.add(device.deviceName);
 
             }
 
@@ -1174,6 +1172,51 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
 
     /**
+     * The Handler that gets information back from the Wifip2pService
+     *
+     */
+    @SuppressLint("HandlerLeak")
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            FragmentActivity activity = getActivity();
+            switch (msg.what) {
+                case P2pConstants.MESSAGE_STATE_CHANGE:
+                    switch (msg.arg1) {
+                        case Wifip2pService.STATE_CONNECTED:
+                            // do something here
+                        case Wifip2pService.STATE_CONNECTING:
+                            // do something here
+                        case Wifip2pService.STATE_NONE:
+                            // do something here
+                            break;
+                    }
+                    break;
+                case P2pConstants.MESSAGE_WRITE:
+                    byte[] writeBuf = (byte[]) msg.obj;
+                    // construct a string from the buffer
+                    String writeMessage = new String(writeBuf);
+                    break;
+                case P2pConstants.MESSAGE_READ:
+                    byte[] readBuf = (byte[]) msg.obj;
+                    // construct a string from the valid bytes in the buffer
+                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    Toast.makeText(getContext(), readMessage, Toast.LENGTH_SHORT).show();
+                    break;
+
+                case P2pConstants.MESSAGE_TOAST:
+                    if (null != activity) {
+                        Toast.makeText(activity, msg.getData().getString(P2pConstants.TOAST),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+            }
+        }
+    };
+
+
+
+    /**
      * client method to send data to other devices or groupOwner
      * through p2p data thread
      *
@@ -1181,22 +1224,16 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
      * @param port port in which to connect
      * @param data String (usually gson) to be sent through the data stream
      */
+    /*
     public static void sendData(String host, int port,  String data) {
 
         Socket socket = new Socket();
 
         try {
-            /**
-             * Create a client socket with the host,
-             * port, and timeout information.
-             */
+
             socket.bind(null);
             socket.connect((new InetSocketAddress(host, port)), 500);
 
-            /**
-             * Create a byte stream from a JPEG file and pipe it to the output stream
-             * of the socket. This data will be retrieved by the server device.
-             */
 
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(data.getBytes());
@@ -1208,10 +1245,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             //catch logic
         }
 
-        /**
-         * Clean up any open sockets when done
-         * transferring or if an exception occurred.
-         */
+
         finally {
             if (socket != null) {
                 if (socket.isConnected()) {
@@ -1226,6 +1260,8 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
     }
 
+    */
+    /*
     public  class DataServerAsyncTask extends AsyncTask<String, Void, String> {
 
 
@@ -1236,7 +1272,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 /*
                  * Create a server socket and wait for client connections. This
                  * call blocks until a connection is accepted from a client
-                 */
+
                 int port = Integer.parseInt(strings[1]);
                 ServerSocket serverSocket = new ServerSocket(port);
                 Socket client = serverSocket.accept();
@@ -1245,7 +1281,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                  * If this code is reached, a client has connected
                  * the group owner sends and invitation to the trip
                  * or requests expenses data
-                 */
+
 
 
                 DataOutputStream mDataOutputStream = new DataOutputStream(client.getOutputStream());
@@ -1266,12 +1302,14 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
         /**
          * Do something...
-         */
+
         @Override
         protected void onPostExecute(String result) {
 
         }
     }
+
+    */
 
 
 }
