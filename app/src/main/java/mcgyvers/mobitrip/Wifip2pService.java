@@ -3,6 +3,7 @@ package mcgyvers.mobitrip;
 import android.content.Context;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -15,6 +16,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 import mcgyvers.mobitrip.interfaces.P2pConstants;
 
@@ -148,6 +150,7 @@ public class Wifip2pService {
      *
      */
     public void write(byte[] out) {
+
         // Create temporary object
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
@@ -157,6 +160,25 @@ public class Wifip2pService {
         }
         // Perform the write unsynchronized
         r.write(out);
+
+
+
+    }
+
+    /**
+     * Indicate that the connection attempt failed and notify the UI Activity.
+     */
+    private void connectionFailed(String mssg) {
+        // Send a failure message back to the Activity
+        Message msg = mHandler.obtainMessage(P2pConstants.MESSAGE_TOAST);
+        Bundle bundle = new Bundle();
+        bundle.putString(P2pConstants.TOAST, mssg);
+        msg.setData(bundle);
+        mHandler.sendMessage(msg);
+
+        mState = STATE_NONE;
+        stop();
+
     }
 
 
@@ -190,7 +212,7 @@ public class Wifip2pService {
         private Socket mmSocket;
 
         public ClientConnectThread() {
-            mmSocket = null;
+            mmSocket = new Socket();
             mState = STATE_CONNECTING;
             Message readMsg = mHandler.obtainMessage(P2pConstants.MESSAGE_STATE_CHANGE, mState);
             readMsg.sendToTarget();
@@ -232,6 +254,8 @@ public class Wifip2pService {
 
 
         }
+
+
 
         public void cancel() {
             try {
@@ -279,6 +303,7 @@ public class Wifip2pService {
              */
             try {
                 mmServerSocket = new ServerSocket(mPort);
+                mmServerSocket.setSoTimeout(5000);
                 mmSocket = mmServerSocket.accept();
 
                 /*
@@ -288,20 +313,30 @@ public class Wifip2pService {
 
 
 
-            } catch (IOException e) {
+            } catch (SocketTimeoutException i){
+                // Connection timeout reached, close and return.
+                connectionFailed("Connection timeout reached");
+
+                Log.e(TAG, "Connection timeout reached", i);
+                mState = STATE_NONE;
+                Message readMsg = mHandler.obtainMessage(P2pConstants.MESSAGE_STATE_CHANGE, mState);
+                readMsg.sendToTarget();
+                return;
+
+            }
+
+            catch (IOException e) {
                 e.printStackTrace();
                 // Unable to connect; close the socket and return.
+                connectionFailed("connection failed");
                 Log.e(TAG, "connect failed", e);
                 mState = STATE_NONE;
                 Message readMsg = mHandler.obtainMessage(P2pConstants.MESSAGE_STATE_CHANGE, mState);
                 readMsg.sendToTarget();
-                try {
-                    mmSocket.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
                 return;
             }
+
+
 
             // The connection attempt succeeded. Perform work associated with
             // the connection in a separate thread.
@@ -317,7 +352,8 @@ public class Wifip2pService {
                 mState = STATE_NONE;
                 Message readMsg = mHandler.obtainMessage(P2pConstants.MESSAGE_STATE_CHANGE, mState);
                 readMsg.sendToTarget();
-                mmSocket.close();
+                if(mmSocket != null) mmSocket.close();
+
             } catch (IOException e) {
                 Log.e(TAG, "Could not close the client socket", e);
             }
@@ -389,7 +425,8 @@ public class Wifip2pService {
          *
          * @param buffer The bytes to write
          */
-        public void write(byte[] buffer){
+
+         void write(byte[] buffer){
             try {
                 mmOutStream.write(buffer);
 
@@ -403,7 +440,7 @@ public class Wifip2pService {
 
         public void cancel() {
             try {
-                mmSocket.close();
+                if(mmSocket != null) mmSocket.close();
             } catch (IOException e) {
                 Log.e(TAG, "close() of connect socket failed", e);
             }

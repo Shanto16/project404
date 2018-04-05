@@ -120,7 +120,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
     AlertDialog.Builder builder;
     AlertDialog peersDialog;
     ArrayList<WifiP2pDevice> devsList = new ArrayList<>();
-    Boolean server_running = false;
 
     String port = "8888";
     String groupOwnerAddress = "";
@@ -269,9 +268,11 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         hospitals.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), MapsActivity.class);
-                intent.putExtra("POI", "Hospital");
-                startActivity(intent);
+                //Intent intent = new Intent(getContext(), MapsActivity.class);
+                //intent.putExtra("POI", "Hospital");
+                //startActivity(intent);
+
+                sendMessage("Holla!",null);
             }
         });
 
@@ -291,9 +292,16 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         restaurants.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), MapsActivity.class);
-                intent.putExtra("POI", "Restaurant");
-                startActivity(intent);
+                //Intent intent = new Intent(getContext(), MapsActivity.class);
+                //intent.putExtra("POI", "Restaurant");
+                //startActivity(intent);
+
+                if(connectionThreads.size() > 0){
+                    System.out.println(devicesConnected);
+                    System.out.println(connectionThreads.get(0).deviceName);
+                    System.out.println(connectionThreads.get(0).getState());
+                }
+
             }
         });
 
@@ -493,6 +501,9 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         return rootView;
     }
 
+    /**
+     * sets the visual percentage of the spent resources
+     */
     private void setPercentage() {
         float exp = 0;
 
@@ -516,6 +527,8 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         manager = (WifiP2pManager) getContext().getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(getContext(), Looper.getMainLooper(), null);
         receiver = new WiFiDirectBroadcastReceiver(manager, channel, this, peerListListener);
+
+
 
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -612,49 +625,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
     }
 
     /**
-     * Handles the client-server data thread and
-     * group negotiation once the peers are connected
-     * @param event
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onNetworkInfoReceived(OnReceiverNetInfoEvent event){
-
-        WifiP2pInfo info = event.getInfo();
-
-        // InetAddress from WifiP2pInfo struc.
-        groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
-        // String port = "8888";
-
-
-        // After the group negotiation, we can determine the group owner
-        // (server).
-        if(info.groupFormed && info.isGroupOwner){
-            Toast.makeText(getContext(), "Group formed. Host", Toast.LENGTH_SHORT).show();
-            if(peersDialog.isShowing())peersDialog.dismiss();
-
-            // starting a data thread with the latest connected device
-            Wifip2pService mService = new Wifip2pService(getContext(), mHandler,port, true, groupOwnerAddress);
-            // assign the name of the latest connect device to this thread so we keep track
-            mService.deviceName = devicesConnected.get(devicesConnected.size() - 1);
-            connectionThreads.add(mService);
-
-
-            // One common case is creating a group owner thread and accepting
-            // incoming connections.
-        } else if(info.groupFormed){
-            Toast.makeText(getContext(), "Connected as Peer", Toast.LENGTH_SHORT).show();
-            if(peersDialog.isShowing())peersDialog.dismiss();
-
-            // starting a data thread with the owner
-            Wifip2pService mService = new Wifip2pService(getContext(), mHandler, port, false, groupOwnerAddress);
-            mService.deviceName = devicesConnected.get(devicesConnected.size() - 1);
-            connectionThreads.add(mService);
-
-        }
-
-    }
-
-    /**
      * Connects to a selected p2p device
      * @param device to be connected to
      */
@@ -691,6 +661,110 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         });
 
     }
+
+    /**
+     * Handles the client-server data thread and
+     * group negotiation once the peers are connected
+     * @param event
+     */
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onNetworkInfoReceived(OnReceiverNetInfoEvent event){
+
+        WifiP2pInfo info = event.getInfo();
+
+        // InetAddress from WifiP2pInfo struc.
+        groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
+        // String port = "8888";
+
+
+        // After the group negotiation, we can determine the group owner
+        // (server).
+        if(info.groupFormed && info.isGroupOwner){
+            Toast.makeText(getContext(), "Group formed. Host", Toast.LENGTH_SHORT).show();
+            if(peersDialog.isShowing())peersDialog.dismiss();
+
+            // starting a data thread with the latest connected device
+            Wifip2pService mService = new Wifip2pService(getContext(), mHandler,port, true, groupOwnerAddress);
+            // assign the name of the latest connect device to this thread so we keep track
+            mService.deviceName = devicesConnected.get(devicesConnected.size() - 1);
+            connectionThreads.add(mService);
+            mService.start();
+
+
+            // One common case is creating a group owner thread and accepting
+            // incoming connections.
+        } else if(info.groupFormed){
+            Toast.makeText(getContext(), "Connected as Peer", Toast.LENGTH_SHORT).show();
+            if(peersDialog.isShowing())peersDialog.dismiss();
+
+            // starting a data thread with the owner
+            Wifip2pService mService = new Wifip2pService(getContext(), mHandler, port, false, groupOwnerAddress);
+            mService.deviceName = devicesConnected.get(devicesConnected.size() - 1);
+            connectionThreads.add(mService);
+            mService.start();
+
+        }
+
+    }
+
+    /**
+     * method for sending a message to a particular device that is connected
+     * to our user, or to broastcast to all the users in the network, if we are
+     * the host.
+     * @param msg String message to be send to the user(s).
+     * @param targetDevice name of the recipient device. If null, a broadcast
+     *                     will be sent to all connected peers.
+     */
+    private void sendMessage(String msg, String targetDevice){
+
+        if(msg.length()  > 0){
+
+            if(connectionThreads.size() == 0 ){
+                // check if there are any threads before continuing
+                Toast.makeText(getContext(), "No devices connected", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (targetDevice == null){
+                // if no target device is specified, broadcast message to all
+                // connected devices, if there are any
+
+                for(int i = 0; i < connectionThreads.size(); i++){
+
+
+                    if (connectionThreads.get(i).getState() == Wifip2pService.STATE_CONNECTED){
+                        // Get the message bytes and tell the WifiP2pService to write
+                        byte[] send = msg.getBytes();
+                        connectionThreads.get(i).write(send);
+                    }
+
+                    else return;
+                }
+            }
+
+            else{
+                // send message to a specific device
+                for(int i = 0; i < connectionThreads.size(); i++){
+
+                    if (targetDevice.equals(connectionThreads.get(i).deviceName)){
+                        if (connectionThreads.get(i).getState() == Wifip2pService.STATE_CONNECTED){
+                            // Get the message bytes and tell the WifiP2pService to write
+                            byte[] send = msg.getBytes();
+                            connectionThreads.get(i).write(send);
+                        }
+
+                        else return;
+
+                    } else Toast.makeText(getContext(), "No device connected",Toast.LENGTH_SHORT).show();
+
+
+                }
+            }
+        }
+
+    }
+
+
 
     /**
      * method for returning the ArrayList of trip objects containing all of the
@@ -857,6 +931,9 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         private TextWatcher memberExpenseWatcher;
     }
 
+    /**
+     * Adapter for showing the users and their expenses on a dialog box
+     */
     public class MemberExpAdapter extends BaseAdapter{
 
         private final ArrayList<Member> members;
@@ -939,6 +1016,9 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
     }
 
 
+    /**
+     * Adapter for showing and editing the expenses of each user on a dialog box
+     */
     public class ExpensesAdapter extends BaseAdapter{
 
         private ArrayList<Expense> expenses;
@@ -1169,7 +1249,20 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // stop all threads when app is closed
+        if(connectionThreads.size() > 0){
+            for(int i = 0; i < connectionThreads.size(); i++){
+                connectionThreads.get(i).stop();
+            }
 
+            devicesConnected.clear();
+        }
+
+
+    }
 
     /**
      * The Handler that gets information back from the Wifip2pService
@@ -1185,6 +1278,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                     switch (msg.arg1) {
                         case Wifip2pService.STATE_CONNECTED:
                             // do something here
+                            Toast.makeText(getContext(), "Device Connected", Toast.LENGTH_SHORT).show();
                         case Wifip2pService.STATE_CONNECTING:
                             // do something here
                         case Wifip2pService.STATE_NONE:
@@ -1195,7 +1289,9 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                 case P2pConstants.MESSAGE_WRITE:
                     byte[] writeBuf = (byte[]) msg.obj;
                     // construct a string from the buffer
+
                     String writeMessage = new String(writeBuf);
+                    System.out.println("Message sent to device: " + writeMessage);
                     break;
                 case P2pConstants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
