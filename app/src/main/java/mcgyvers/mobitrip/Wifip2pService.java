@@ -173,6 +173,7 @@ public class Wifip2pService {
         Message msg = mHandler.obtainMessage(P2pConstants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         bundle.putString(P2pConstants.TOAST, mssg);
+        bundle.putString("devAddr", devAddr);
         msg.setData(bundle);
         mHandler.sendMessage(msg);
 

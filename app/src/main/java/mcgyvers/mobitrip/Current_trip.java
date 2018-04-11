@@ -23,6 +23,7 @@ import android.net.Uri;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
@@ -126,8 +127,10 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
     ArrayList<Wifip2pService> connectionThreads = new ArrayList<>();
     ArrayList<String> devicesConnected = new ArrayList<>();
+    ArrayList<String> devAddrConnected = new ArrayList<>();
     //-----------------------------//
 
+    String TAG = "current_trip";
     // adapter for handling expenses
     final ArrayList<Expense> expenses = new ArrayList<>();
     final ExpensesAdapter expensesAdapter = new ExpensesAdapter(expenses, this);
@@ -317,9 +320,11 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         fuel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getContext(), MapsActivity.class);
+
+                /*Intent intent = new Intent(getContext(), MapsActivity.class);
                 intent.putExtra("POI", "Fuel");
-                startActivity(intent);
+                startActivity(intent); */
+
             }
         });
 
@@ -566,6 +571,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
     }
 
+    // search for peers
     private void discoverPs(WifiP2pManager.Channel channel){
 
         if(manager != null){
@@ -578,12 +584,12 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
                 @Override
                 public void onFailure(int reason) {
-                    Toast.makeText(getContext(), "didnt find shit, sorry", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getContext(), "didnt find peers, try again later", Toast.LENGTH_LONG).show();
 
                 }
             });
         }else{
-            Toast.makeText(getContext(), "manager is null", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "your device does not support wifi direct", Toast.LENGTH_LONG).show();
         }
 
 
@@ -639,6 +645,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             public void onSuccess() {
                 // keep the name of the latest device connected to keep track
                 devicesConnected.add(device.deviceName);
+                devAddrConnected.add(device.deviceAddress);
 
             }
 
@@ -660,6 +667,35 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             }
         });
 
+    }
+
+
+    /**
+     * Disconnects from all connected peers, if the current phone is the group owner
+     */
+    public void disconnect() {
+        if (manager != null && channel != null) {
+            manager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+                @Override
+                public void onGroupInfoAvailable(WifiP2pGroup group) {
+                    if (group != null && manager != null && channel != null
+                            && group.isGroupOwner()) {
+                        manager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+
+                            @Override
+                            public void onSuccess() {
+                                Log.d(TAG, "removeGroup onSuccess -");
+                            }
+
+                            @Override
+                            public void onFailure(int reason) {
+                                Log.d(TAG, "removeGroup onFailure -" + reason);
+                            }
+                        });
+                    }
+                }
+            });
+        }
     }
 
     /**
@@ -686,9 +722,12 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             // starting a data thread with the latest connected device
             Wifip2pService mService = new Wifip2pService(getContext(), mHandler,port, true, groupOwnerAddress);
             // assign the name of the latest connect device to this thread so we keep track
-            mService.deviceName = devicesConnected.get(devicesConnected.size() - 1);
+            int i = devicesConnected.size() - 1;
+            mService.deviceName = devicesConnected.get(i);
+            mService.devAddr = devAddrConnected.get(i);
             connectionThreads.add(mService);
             mService.start();
+            devicesListAdapter.notifyDataSetChanged();
 
 
             // One common case is creating a group owner thread and accepting
@@ -1166,6 +1205,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         ArrayList<WifiP2pDevice> devslist;
         private final MemberData.onItemClickListener listener;
 
+
         DevicesListAdapter(ArrayList<WifiP2pDevice> list, Context context, MemberData.onItemClickListener listener){
             super(context, R.layout.get_expense_model);
             this.devslist = list;
@@ -1195,10 +1235,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             gt.setText("Invite");
 
 
-
-
-
-
             dev.setText(devslist.get(position).deviceName);
             mc.setText(devslist.get(position).deviceAddress);
             gt.setOnClickListener(new View.OnClickListener() {
@@ -1208,6 +1244,21 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
                 }
             });
+
+            if(devicesConnected.size() > 0){
+                for(int i = 0; i < devAddrConnected.size(); i++){
+                    if(devslist.get(position).deviceAddress.equals(devAddrConnected.get(i))){
+                        dev.setText(devicesConnected.get(i));
+                        gt.setText("Connected");
+                        gt.setTextColor(Color.BLUE);
+                        gt.setEnabled(false);
+                    }
+                }
+            }
+
+
+
+
 
             return row;
         }
@@ -1259,7 +1310,10 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             }
 
             devicesConnected.clear();
+            devAddrConnected.clear();
+
         }
+        disconnect();
 
 
     }
@@ -1304,6 +1358,16 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                     if (null != activity) {
                         Toast.makeText(activity, msg.getData().getString(P2pConstants.TOAST),
                                 Toast.LENGTH_SHORT).show();
+
+                        // update our list of connected devices
+                        String devAddr = msg.getData().getString("devAddr");
+                        int i = devAddrConnected.indexOf(devAddr);
+                        if(i > -1){
+                            devAddrConnected.remove(i);
+                            devicesConnected.remove(i);
+                            devicesListAdapter.notifyDataSetChanged();
+                        }
+
                     }
                     break;
             }
@@ -1312,100 +1376,6 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
 
 
-    /**
-     * client method to send data to other devices or groupOwner
-     * through p2p data thread
-     *
-     * @param host host address
-     * @param port port in which to connect
-     * @param data String (usually gson) to be sent through the data stream
-     */
-    /*
-    public static void sendData(String host, int port,  String data) {
-
-        Socket socket = new Socket();
-
-        try {
-
-            socket.bind(null);
-            socket.connect((new InetSocketAddress(host, port)), 500);
-
-
-            OutputStream outputStream = socket.getOutputStream();
-            outputStream.write(data.getBytes());
-
-
-        } catch (FileNotFoundException e) {
-            //catch logic
-        } catch (IOException e) {
-            //catch logic
-        }
-
-
-        finally {
-            if (socket != null) {
-                if (socket.isConnected()) {
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        //catch logic
-                    }
-                }
-            }
-        }
-
-    }
-
-    */
-    /*
-    public  class DataServerAsyncTask extends AsyncTask<String, Void, String> {
-
-
-        @Override
-        protected String doInBackground(String... strings) {
-            try {
-
-                /*
-                 * Create a server socket and wait for client connections. This
-                 * call blocks until a connection is accepted from a client
-
-                int port = Integer.parseInt(strings[1]);
-                ServerSocket serverSocket = new ServerSocket(port);
-                Socket client = serverSocket.accept();
-
-                /*
-                 * If this code is reached, a client has connected
-                 * the group owner sends and invitation to the trip
-                 * or requests expenses data
-
-
-
-                DataOutputStream mDataOutputStream = new DataOutputStream(client.getOutputStream());
-                mDataOutputStream.writeUTF(strings[0]);
-                mDataOutputStream.flush();
-                serverSocket.close();
-                server_running = false;
-
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
-
-            return null;
-        }
-
-        /**
-         * Do something...
-
-        @Override
-        protected void onPostExecute(String result) {
-
-        }
-    }
-
-    */
 
 
 }

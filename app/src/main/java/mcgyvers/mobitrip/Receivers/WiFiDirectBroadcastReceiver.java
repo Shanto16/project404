@@ -61,6 +61,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver{
             // asynchronous call and the calling activity is notified with a
             // callback on PeerListListener.onPeersAvailable()
 
+
+
             //Toast.makeText(context, "something happened", Toast.LENGTH_LONG).show();
             if(mManager != null){
                 mManager.requestPeers(mChannel, mPeerListener);
@@ -77,6 +79,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver{
 
                 }
             };
+            // handle for when peers disappear
 
 
 
@@ -106,6 +109,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver{
 
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
             // Respond to this device's wifi state changing
+
         }
 
 
