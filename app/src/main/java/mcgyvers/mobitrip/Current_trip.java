@@ -27,6 +27,7 @@ import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
+import android.nfc.Tag;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -371,6 +372,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
                 if(currentTrip != null &&  currentTrip.getExpenses() != null){
                     if(expenses.isEmpty()) expenses.addAll(currentTrip.getExpenses());
+
                 } else{
                     Toast.makeText(getContext(), "This trip has no expenses", Toast.LENGTH_SHORT).show();
                 }
@@ -394,12 +396,14 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
                                 expensesAdapter.notifyDataSetChanged();
                                 currentTrip.setExpenses(expenses);
-                                UpdateTripList(getContext(),currentTrip, currentPos);
+                                Log.d(TAG, "NEW EXPENSE " + currentTrip.getExpenses());
+                                UpdateCurrentTrip(getContext(), currentTrip);
+                                //UpdateTripList(getContext(),currentTrip, currentPos);
                             }else{
                                 Toast.makeText(getContext(), "Error adding expenses", Toast.LENGTH_LONG).show();
                             }
                         }
-
+                        Toast.makeText(getContext(),"Saved to your expenses", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                 });
@@ -843,6 +847,7 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
 
         Gson gson = new Gson();
         if(cur != ""){
+            System.out.println("current trip: " + cur);
             return gson.fromJson(cur, Trip.class);
         } else return null;
 
@@ -869,6 +874,19 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         editor.putString(context.getString(R.string.trips_array), tripsArray);
         editor.apply();
         System.out.println(tripsArray);
+
+
+    }
+
+    public static void UpdateCurrentTrip(Context context, Trip trip){
+
+        String currentTrip = new Gson().toJson(trip);
+
+        SharedPreferences currPrefs = context.getSharedPreferences(MainActivity.CURR_PREFS, Context.MODE_PRIVATE);
+        String cur = currPrefs.getString(MainActivity.CURR_TRIP, "");
+        SharedPreferences.Editor editor = currPrefs.edit();
+        editor.putString(MainActivity.CURR_TRIP, currentTrip);
+        editor.apply();
 
 
     }

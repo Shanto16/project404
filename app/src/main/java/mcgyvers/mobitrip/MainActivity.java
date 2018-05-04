@@ -1,14 +1,10 @@
 package mcgyvers.mobitrip;
 
-import android.app.Fragment;
-import android.app.IntentService;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.icu.text.SimpleDateFormat;
+import java.text.SimpleDateFormat;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
@@ -24,6 +20,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -137,12 +134,13 @@ public class MainActivity extends AppCompatActivity {
         upcoming = YourTrips.getUpcomingTrips(getApplicationContext());
 
         for(int i = 0; i < upcoming.size(); i++){
-
+            Log.d("Notifyupcoming", upcoming.get(i).getDate());
             String inputDateString = upcoming.get(i).getDate();
             Calendar calCurr = Calendar.getInstance();
             Calendar day = Calendar.getInstance();
             try {
                 day.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(inputDateString));
+                //day.setTime(new SimpleDateFormat("dd/MM/yyyy").parse(inputDateString));
             } catch (ParseException e) {
                 e.printStackTrace();
             }

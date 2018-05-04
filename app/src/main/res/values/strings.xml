@@ -13,6 +13,7 @@
     <string name="title_activity_maps">Maps</string>
     <string name="radio_sub_text">Downloading the map for destination area enables you to use maps offline.</string>
     <string name="download_map_for">Downloading the maps for destination area enables you to use maps offline</string>
+    <string name="currentTrip">cTrip</string>
 
 
 </resources>
