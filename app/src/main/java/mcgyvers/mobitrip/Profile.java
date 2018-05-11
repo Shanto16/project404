@@ -1,5 +1,7 @@
 package mcgyvers.mobitrip;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.ornach.nobobutton.NoboButton;
 import com.rengwuxian.materialedittext.MaterialEditText;
@@ -47,6 +50,23 @@ public class Profile extends Fragment{
         phonePT.setTypeface(regular);
         emailPT.setTypeface(regular);
         addressPT.setTypeface(regular);
+
+        savePT.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences currPrefs = getContext().getSharedPreferences(MainActivity.CURR_PREFS, Context.MODE_PRIVATE);
+                SharedPreferences sharedPreferences = getContext().getSharedPreferences(getContext().getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor currEditor = currPrefs.edit();
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.clear();
+                currEditor.clear();
+                editor.apply();
+                currEditor.apply();
+                Toast.makeText(getContext(), "Trip records wiped out", Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
 
         return rootView;
     }

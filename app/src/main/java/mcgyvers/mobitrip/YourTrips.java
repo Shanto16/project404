@@ -140,7 +140,7 @@ public class YourTrips extends Fragment {
         ArrayList<Trip> getAllTrips = gson.fromJson(data, new TypeToken<ArrayList<Trip>>(){}.getType());
         for(int i = 0; i < getAllTrips.size(); i++){
             System.out.println("checking trip: " + getAllTrips.get(i).getOrigin());
-            if(!isOutdated(getAllTrips.get(i).getDate())){
+            if(!isOutdated(getAllTrips.get(i).getDate()) && !getAllTrips.get(i).isCompleted()){
                 upcoming.add(getAllTrips.get(i));
             }
 
@@ -158,7 +158,7 @@ public class YourTrips extends Fragment {
         ArrayList<Trip> getAllTrips = gson.fromJson(data, new TypeToken<ArrayList<Trip>>(){}.getType());
         for(int i = 0; i < getAllTrips.size(); i++){
             System.out.println("checking trip: " + getAllTrips.get(i).getOrigin());
-            if(isOutdated(getAllTrips.get(i).getDate())){
+            if(getAllTrips.get(i).isCompleted()){
                 tripList.add(getAllTrips.get(i));
                 mAdaper.notifyDataSetChanged();
             }else{

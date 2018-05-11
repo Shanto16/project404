@@ -254,8 +254,11 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             @Override
             public void onClick(View v) {
                 // for lack of a better something to do here
-                // we just clean the current trip file and
+                // we set the trip to complete, update it on the list
+                // of trips then clean the current trip file and
                 // bring the user back to the 'your trips' list
+                currentTrip.setCompleted(true);
+                UpdateTripList(getContext(),currentTrip, currentPos);
                 SharedPreferences currShared = getContext().getSharedPreferences(MainActivity.CURR_PREFS, Context.MODE_PRIVATE);
                 SharedPreferences.Editor currEditor = currShared.edit();
                 currEditor.clear();
@@ -272,39 +275,39 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
         hospitals.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent intent = new Intent(getContext(), MapsActivity.class);
-                //intent.putExtra("POI", "Hospital");
-                //startActivity(intent);
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                intent.putExtra("POI", "Hospital");
+                startActivity(intent);
 
-                sendMessage("Holla!",null);
+                //sendMessage("Holla!",null);
             }
         });
 
         policeStation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent intent = new Intent(getContext(), MapsActivity.class);
-                //intent.putExtra("POI", "Police");
-                //startActivity(intent);
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                intent.putExtra("POI", "Police");
+                startActivity(intent);
 
-                discoverPs(channel);
-                peersDialog = builder.create();
-                peersDialog.show();
+                //discoverPs(channel);
+                //peersDialog = builder.create();
+                //peersDialog.show();
             }
         });
 
         restaurants.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent intent = new Intent(getContext(), MapsActivity.class);
-                //intent.putExtra("POI", "Restaurant");
-                //startActivity(intent);
+                Intent intent = new Intent(getContext(), MapsActivity.class);
+                intent.putExtra("POI", "Restaurant");
+                startActivity(intent);
 
-                if(connectionThreads.size() > 0){
+                /*if(connectionThreads.size() > 0){
                     System.out.println(devicesConnected);
                     System.out.println(connectionThreads.get(0).deviceName);
                     System.out.println(connectionThreads.get(0).getState());
-                }
+                }*/
 
             }
         });
@@ -322,9 +325,9 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
             @Override
             public void onClick(View view) {
 
-                /*Intent intent = new Intent(getContext(), MapsActivity.class);
+                Intent intent = new Intent(getContext(), MapsActivity.class);
                 intent.putExtra("POI", "Fuel");
-                startActivity(intent); */
+                startActivity(intent);
 
             }
         });
@@ -471,7 +474,8 @@ public class Current_trip extends Fragment implements MemberData.onItemClickList
                             currentPos = getCurrentPos(getContext());
                             memberExpAdapter.notifyDataSetChanged();
                             currentTrip.setMembers(members);
-                            UpdateTripList(getContext(),currentTrip, currentPos);
+                            UpdateCurrentTrip(context, currentTrip);
+                            //UpdateTripList(getContext(),currentTrip, currentPos);
                         }
 
 

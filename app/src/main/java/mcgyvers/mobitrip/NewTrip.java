@@ -395,6 +395,7 @@ public class NewTrip extends Fragment {
         Trip trip = new Trip(origin, destination_s, amount_s, common_s, null, date, String.valueOf(tripId), null);
 
         trip.isHost = true;
+        trip.setCompleted(false);
         // setting the name of the trip
         if(tripName.getText().toString() != ""){
             trip.setName(tripName.getText().toString());
